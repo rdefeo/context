@@ -1,5 +1,6 @@
 var 
   express = require('express'),
+  pjson = require('./package.json'),  
   session = require('./lib/session')
   
 var app = express();
