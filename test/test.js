@@ -1,6 +1,7 @@
 var 
   assert = require("assert"),
-  session = require("../lib/session")
+  session = require("../lib/session"),
+  _ = require('underscore')
 
 describe('session', function(){
   describe('newestUnique', function(){
@@ -109,6 +110,113 @@ describe('session', function(){
       assert.equal(target[2].data.value, 'pumps');
       
     });
+  });
+    
+  describe('groupedMinMax', function(){
+    it('empty list has empty group info', function(){
+      var items = [];
+      
+      var target = session.groupedMinMax(items); 
+      assert.equal(target.max, -Infinity);
+      assert.equal(target.min, Infinity);
+    });
+    it('single item overal min and max are same', function(){
+      var items = [
+        { sessionID: '6c3c9f61-8f22-4e4c-8619-2eb0282b14df',
+            uuid: 'f46b177e-4add-4a27-993c-de69f2ef9b2d',
+            timestamp: '2014-01-10T06:44:52.509Z',
+            data: { type: 'colour', value: 'pink', method: 'exact' },
+            _id: '52cf96e4e9d40c0000d64696' }
+      ];
+      
+      var target = session.groupedMinMax(items); 
+      assert.equal(target.max, 1389336292509);
+      assert.equal(target.min, 1389336292509);
+      assert.equal(target.colour.max, 1389336292509);
+      assert.equal(target.colour.min, 1389336292509);
+    });
+    it('multiple item overal min and max are correct', function(){
+      var items = [
+        { sessionID: '6c3c9f61-8f22-4e4c-8619-2eb0282b14df',
+            uuid: 'f46b177e-4add-4a27-993c-de69f2ef9b2d',
+            timestamp: '2014-01-10T06:44:52.509Z',
+            data: { type: 'colour', value: 'pink', method: 'exact' },
+            _id: '52cf96e4e9d40c0000d64696' },
+        { sessionID: '6c3c9f61-8f22-4e4c-8619-2eb0282b14df',
+            uuid: 'f46b177e-4add-4a27-993c-de69f2ef9b2d',
+            timestamp: '2014-01-10T06:44:50.509Z',
+            data: { type: 'colour', value: 'blue', method: 'exact' },
+            _id: '52cf96e4e9d40c0000d64696' }
+
+      ];
+      
+      var target = session.groupedMinMax(items); 
+      assert.equal(target.max, 1389336292509);
+      assert.equal(target.min, 1389336290509);
+      assert.equal(target.colour.max, 1389336292509);
+      assert.equal(target.colour.min, 1389336290509);
+    });
+    it('multiple items in one category and single in next overal min and max are correct', function(){
+      var items = [
+        { sessionID: '6c3c9f61-8f22-4e4c-8619-2eb0282b14df',
+            uuid: 'f46b177e-4add-4a27-993c-de69f2ef9b2d',
+            timestamp: '2014-01-10T06:44:52.509Z',
+            data: { type: 'colour', value: 'pink', method: 'exact' },
+            _id: '52cf96e4e9d40c0000d64696' },
+        { sessionID: '6c3c9f61-8f22-4e4c-8619-2eb0282b14df',
+            uuid: 'f46b177e-4add-4a27-993c-de69f2ef9b2d',
+            timestamp: '2014-01-10T06:42:17.509Z',
+            data: { type: 'colour', value: 'blue', method: 'exact' },
+            _id: '52cf96e4e9d40c0000d64696' },
+        { sessionID: '6c3c9f61-8f22-4e4c-8619-2eb0282b14df',
+            uuid: 'f46b177e-4add-4a27-993c-de69f2ef9b2d',
+            timestamp: '2014-01-10T06:41:12.509Z',
+            data: { type: 'style', value: 'pumps', method: 'exact' },
+            _id: '52cf96e4e9d40c0000d64696' }
+
+      ];
+      
+      var target = session.groupedMinMax(items); 
+      assert.equal(target.max, 1389336292509);
+      assert.equal(target.min, 1389336072509);
+      assert.equal(target.colour.max, 1389336292509);
+      assert.equal(target.colour.min, 1389336137509);
+      assert.equal(target.style.max, 1389336072509);
+      assert.equal(target.style.min, 1389336072509);
+    });
+    it('multiple items in multiple category overal min and max are correct', function(){
+      var items = [
+        { sessionID: '6c3c9f61-8f22-4e4c-8619-2eb0282b14df',
+            uuid: 'f46b177e-4add-4a27-993c-de69f2ef9b2d',
+            timestamp: '2014-01-10T06:44:52.509Z',
+            data: { type: 'colour', value: 'pink', method: 'exact' },
+            _id: '52cf96e4e9d40c0000d64696' },
+        { sessionID: '6c3c9f61-8f22-4e4c-8619-2eb0282b14df',
+            uuid: 'f46b177e-4add-4a27-993c-de69f2ef9b2d',
+            timestamp: '2014-01-10T06:42:17.509Z',
+            data: { type: 'colour', value: 'blue', method: 'exact' },
+            _id: '52cf96e4e9d40c0000d64696' },
+        { sessionID: '6c3c9f61-8f22-4e4c-8619-2eb0282b14df',
+            uuid: 'f46b177e-4add-4a27-993c-de69f2ef9b2d',
+            timestamp: '2014-01-10T06:41:12.509Z',
+            data: { type: 'style', value: 'pumps', method: 'exact' },
+            _id: '52cf96e4e9d40c0000d64696' },
+        { sessionID: '6c3c9f61-8f22-4e4c-8619-2eb0282b14df',
+            uuid: 'f46b177e-4add-4a27-993c-de69f2ef9b2d',
+            timestamp: '2014-01-10T06:43:39.509Z',
+            data: { type: 'style', value: 'pumps', method: 'exact' },
+            _id: '52cf96e4e9d40c0000d64696' }
+
+      ];
+      
+      var target = session.groupedMinMax(items); 
+      assert.equal(target.max, 1389336292509);
+      assert.equal(target.min, 1389336072509);
+      assert.equal(target.colour.max, 1389336292509);
+      assert.equal(target.colour.min, 1389336137509);
+      assert.equal(target.style.max, 1389336219509);
+      assert.equal(target.style.min, 1389336072509);
+    });    
   });
   describe('processItems', function(){
     it('empty context empty response', function(){
