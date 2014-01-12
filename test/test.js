@@ -234,10 +234,82 @@ describe('session', function(){
       ];
       var target = session.processItems(context); 
       assert.equal(target.length, 1);
-      assert.equal(target[0].ageScore, 0.5);
+      assert.equal(target[0].ageScore, 2);
+      
+    });
+    it('two single items different categories have correct ageScore', function(){
+      var context = [
+        { sessionID: '6c3c9f61-8f22-4e4c-8619-2eb0282b14df',
+            uuid: 'f46b177e-4add-4a27-993c-de69f2ef9b2d',
+            timestamp: '2014-01-10T06:44:52.509Z',
+            data: { type: 'colour', value: 'pink', method: 'exact' },
+            _id: '52cf96e4e9d40c0000d64696' },
+        { sessionID: '6c3c9f61-8f22-4e4c-8619-2eb0282b14df',
+            uuid: 'f46b177e-4add-4a27-993c-de69f2ef9b2d',
+            timestamp: '2014-01-10T06:44:53.509Z',
+            data: { type: 'style', value: 'pumps', method: 'exact' },
+            _id: '52cf96e4e9d40c0000d64696' }
+        
+      ];
+      var target = session.processItems(context); 
+      assert.equal(target.length, 2);
+      assert.equal(target[0].ageScore, 2);
+      assert.equal(target[0].type, "colour");
+      
+      assert.equal(target[1].ageScore, 2);
+      assert.equal(target[1].type, "style");
       
     });
     
+    it('two multiple items different categories have correct ageScore', function(){
+      var context = [
+        { sessionID: '6c3c9f61-8f22-4e4c-8619-2eb0282b14df',
+            uuid: 'f46b177e-4add-4a27-993c-de69f2ef9b2d',
+            timestamp: '2014-01-10T06:44:52.509Z',
+            data: { type: 'colour', value: 'pink', method: 'exact' },
+            _id: '52cf96e4e9d40c0000d64696' },
+        { sessionID: '6c3c9f61-8f22-4e4c-8619-2eb0282b14df',
+            uuid: 'f46b177e-4add-4a27-993c-de69f2ef9b2d',
+            timestamp: '2014-01-10T06:44:53.509Z',
+            data: { type: 'style', value: 'pumps', method: 'exact' },
+            _id: '52cf96e4e9d40c0000d64696' },
+        { sessionID: '6c3c9f61-8f22-4e4c-8619-2eb0282b14df',
+            uuid: 'f46b177e-4add-4a27-993c-de69f2ef9b2d',
+            timestamp: '2014-01-10T06:40:50.509Z',
+            data: { type: 'style', value: 'high heels', method: 'exact' },
+            _id: '52cf96e4e9d40c0000d64696' },
+        { sessionID: '6c3c9f61-8f22-4e4c-8619-2eb0282b14df',
+            uuid: 'f46b177e-4add-4a27-993c-de69f2ef9b2d',
+            timestamp: '2014-01-10T06:34:53.509Z',
+            data: { type: 'colour', value: 'blue', method: 'exact' },
+            _id: '52cf96e4e9d40c0000d64696' },
+        { sessionID: '6c3c9f61-8f22-4e4c-8619-2eb0282b14df',
+            uuid: 'f46b177e-4add-4a27-993c-de69f2ef9b2d',
+            timestamp: '2014-01-10T06:04:53.509Z',
+            data: { type: 'colour', value: 'yellow', method: 'exact' },
+            _id: '52cf96e4e9d40c0000d64696' }
+        
+      ];
+      
+      var target = session.processItems(context); 
+      console.dir(target);
+      assert.equal(target.length, 5);
+      assert.equal(target[0].ageScore, 2);
+      assert.equal(target[0].type, "colour");
+      
+      assert.equal(target[1].ageScore, 2);
+      assert.equal(target[1].type, "style");
+
+      assert.equal(target[2].ageScore, 1);
+      assert.equal(target[2].type, "style");
+
+      assert.equal(target[3].ageScore, 1.7503126302626093);
+      assert.equal(target[3].type, "colour");
+
+      assert.equal(target[4].ageScore, 1);
+      assert.equal(target[4].type, "colour");
+      
+    });
   })
 })
   
