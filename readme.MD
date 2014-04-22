@@ -1,7 +1,7 @@
 ####Environment variables
 Run from app directory
 ````
-heroku config:set MONGOHQ_CONTEXT_URL="mongodb://context:context@dharma.mongohq.com:10064/context"
+dokku config:set context MONGOHQ_CONTEXT_URL="mongodb://context:context@dharma.mongohq.com:10064/context"
 ````
 
 

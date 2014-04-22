@@ -1,4 +1,6 @@
 var 
+  log4js = require('log4js'),
+  logger = log4js.getLogger('app'),
   express = require('express'),
   pjson = require('./package.json'),  
   session = require('./lib/session')
@@ -41,5 +43,5 @@ app.post('/session/:sessionID', session.post);
 
 var port = process.env.PORT || 5002;
 app.listen(port, function() {
-  console.log("app=context,port=%d,mode=%s,action=started", port, app.settings.env);
+  logger.info("app=context,port=%d,mode=%s,action=started", port, app.settings.env);
 });
