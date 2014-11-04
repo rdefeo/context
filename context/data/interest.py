@@ -16,6 +16,26 @@ class Interest(Data):
     def open_connection(self):
         self.collection = self.create_db().interests
 
+    def find(self, user_id, _type):
+        db_items = self.collection.find(
+            {
+                "user_id": user_id,
+                "type": _type,
+                "active": True
+            }
+        )
+        items = []
+        for x in db_items:
+            items.append(
+                {
+                    "product_id": x["product_id"],
+                    "type": x["type"]
+                }
+            )
+
+        return items
+
+
     def upsert(self, product_id, user_id, active, _type, date=None):
         self.LOGGER.info("action=interest_upserting,product_id=%s,user_id=%s", product_id, user_id)
 
