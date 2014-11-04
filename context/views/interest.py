@@ -20,3 +20,16 @@ def add_heart(user_id, product_id):
     resp = jsonify({})
     resp.status_code = 201
     return resp
+
+@mod_interest.route('heart/<product_id>', methods=['DELETE'])
+def remove_heart(user_id, product_id):
+    interest.upsert(
+        product_id,
+        user_id,
+        False,
+        TYPE_HEART
+    )
+    resp = jsonify({})
+
+    resp.status_code = 204
+    return resp
