@@ -16,14 +16,21 @@ class Interest(Data):
     def open_connection(self):
         self.collection = self.create_db().interests
 
-    def find(self, user_id, _type):
-        db_items = self.collection.find(
-            {
-                "user_id": user_id,
-                "type": _type,
-                "active": True
-            }
-        )
+    def find(self, _type, user_id=None, session_id=None):
+        if user_id is None and session_id is None:
+            raise Exception("no parameters specified")
+
+        query = {
+            "type": _type,
+            "active": True
+        }
+        if session_id is not None:
+            query["session_id"] = session_id
+
+        if user_id is not None:
+            query["user_id"] = user_id
+
+        db_items = self.collection.find(query)
         items = []
         for x in db_items:
             items.append(
@@ -36,29 +43,41 @@ class Interest(Data):
         return items
 
 
-    def upsert(self, product_id, user_id, active, _type, date=None):
-        self.LOGGER.info("action=interest_upserting,product_id=%s,user_id=%s", product_id, user_id)
+    def upsert(self, product_id, active, _type, user_id=None, session_id=None, date=None):
+        if user_id is None and session_id is None:
+            raise Exception("no parameters specified")
 
         if date is None:
             date = datetime.now().isoformat()
 
+        query = {
+            "type": _type,
+            "product_id": product_id,
+        }
+        set_on_insert = {
+            "product_id": product_id,
+            "type": _type,
+            "created": date
+        }
+
+        if session_id is not None:
+            query["session_id"] = session_id
+            set_on_insert["session_id"] = session_id
+
+        if user_id is not None:
+            query["user_id"] = user_id
+            set_on_insert["user_id"] = user_id
+
+        self.LOGGER.info("action=interest_upserting,product_id=%s,user_id=%s,session_id=%s", product_id, user_id, session_id)
+
         self.collection.update(
-            {
-                "user_id": user_id,
-                "product_id": product_id,
-                "type": _type
-            },
+            query,
             {
                 "$set": {
                     "active": active,
                     "updated": date
                 },
-                "$setOnInsert": {
-                    "user_id": user_id,
-                    "product_id": product_id,
-                    "type": _type,
-                    "created": date
-                }
+                "$setOnInsert": set_on_insert
             },
             upsert=True
         )
