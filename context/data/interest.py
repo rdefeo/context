@@ -7,7 +7,7 @@ from bson.son import SON
 from datetime import datetime
 
 TYPE_HEART = "heart"
-
+TYPE_DETAIL = "detail"
 
 class Interest(Data):
     LOGGER = logging.getLogger(__name__)
