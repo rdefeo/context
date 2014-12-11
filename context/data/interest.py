@@ -8,6 +8,7 @@ from datetime import datetime
 
 TYPE_HEART = "heart"
 TYPE_DETAIL = "detail"
+TYPE_REMOVE = "remove"
 
 class Interest(Data):
     LOGGER = logging.getLogger(__name__)
