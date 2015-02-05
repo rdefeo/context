@@ -50,7 +50,7 @@ def add_detail(product_id):
     return create_interest_record(product_id, TYPE_DETAIL, True)
 
 @mod_interest.route('affiliate_redirects/<product_id>', methods=['PUT'])
-def add_detail(product_id):
+def add_affiliate_redirect(product_id):
     """
     When someone clicks on the show details button
     """
