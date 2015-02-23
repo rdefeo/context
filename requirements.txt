@@ -1,3 +1,4 @@
 pymongo>=2.7.2
 flask>=0.10.1
 numpy>=1.9.0
+mock>=1.0.1
