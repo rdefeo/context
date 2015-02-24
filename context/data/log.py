@@ -21,3 +21,40 @@ class Log(Data):
         self.collection.insert(
             data
         )
+
+    def map_reduce_aliases(self):
+        """
+        Used to get the more displayed results
+        :param _id_type_list: which types to consider in detection
+        :return:
+        """
+
+        mapper = Code("""
+            function(){
+                for(var i in this.items) {
+                    var item = this.items[i]
+                    emit( { _id: item._id, type: "result_listing" }, 1 )
+                }
+            }
+        """)
+        reducer = Code("""
+            function(key, values) {
+                return Array.sum(values);
+            }
+        """)
+        result = self.collection.map_reduce(
+            mapper,
+            reducer,
+            query={
+                "type": "results"
+            },
+            # out=SON(
+            #     [
+            #         ("replace", "aliases_attributes")
+            #         # , ("db", "outdb")
+            #     ]
+            # )
+
+        )
+
+        return result
