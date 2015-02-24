@@ -45,13 +45,18 @@ class Log(Data):
                 return Array.sum(values);
             }
         """)
+
+        timestamp = (now - timedelta(days=days_behind)).isoformat()
+
+        self.LOGGER.info("generate=product_result_listing,timestamp=%s,out=product_result_listing,action=replace,db=suggest", timestamp)
+
         result = self.collection.map_reduce(
             mapper,
             reducer,
             query={
                 "type": "results",
                 "timestamp": {
-                    "$gte": (now - timedelta(days=days_behind)).isoformat()
+                    "$gte": timestamp
                 }
             },
             out=SON(
