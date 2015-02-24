@@ -11,6 +11,7 @@ TYPE_DETAIL = "detail"
 TYPE_REMOVE = "remove"
 TYPE_AFFILIATE_REDIRECT = "affiliate_redirect"
 
+
 class Interest(Data):
     LOGGER = logging.getLogger(__name__)
     collection_name = "interests"

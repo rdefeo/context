@@ -5,7 +5,7 @@ import pymongo
 from context.data.data import Data
 from bson.code import Code
 from bson.son import SON
-from datetime import datetime
+from datetime import datetime, timedelta
 
 
 class Log(Data):
@@ -19,7 +19,7 @@ class Log(Data):
             data
         )
 
-    def map_reduce_aliases(self):
+    def map_product_result_listing(self, now=datetime.now(), days_behind=30):
         """
         Used to get the more displayed results
         :param _id_type_list: which types to consider in detection
@@ -30,7 +30,13 @@ class Log(Data):
             function(){
                 for(var i in this.items) {
                     var item = this.items[i]
-                    emit( { _id: item._id, type: "result_listing" }, 1 )
+                    emit(
+                        {
+                            _id: ObjectId(item._id),
+                            type: "result_listing"
+                        },
+                        1
+                    )
                 }
             }
         """)
@@ -43,14 +49,17 @@ class Log(Data):
             mapper,
             reducer,
             query={
-                "type": "results"
+                "type": "results",
+                "timestamp": {
+                    "$gte": (now - timedelta(days=days_behind)).isoformat()
+                }
             },
-            # out=SON(
-            #     [
-            #         ("replace", "aliases_attributes")
-            #         # , ("db", "outdb")
-            #     ]
-            # )
+            out=SON(
+                [
+                    ("replace", "product_result_listing"),
+                    ("db", "suggest")
+                ]
+            )
 
         )
 
