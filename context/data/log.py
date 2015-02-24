@@ -10,10 +10,7 @@ from datetime import datetime
 
 class Log(Data):
     LOGGER = logging.getLogger(__name__)
-    collection = None
-
-    def open_connection(self):
-        self.collection = self.create_db().logs
+    collection_name = "logs"
 
     def insert(self, _type, payload):
         data = payload

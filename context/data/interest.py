@@ -13,10 +13,7 @@ TYPE_AFFILIATE_REDIRECT = "affiliate_redirect"
 
 class Interest(Data):
     LOGGER = logging.getLogger(__name__)
-    collection = None
-
-    def open_connection(self):
-        self.collection = self.create_db().interests
+    collection_name = "interests"
 
     def find(self, _type, user_id=None, session_id=None):
         if user_id is None and session_id is None:
@@ -43,7 +40,6 @@ class Interest(Data):
             )
 
         return items
-
 
     def upsert(self, product_id, active, _type, user_id=None, session_id=None, date=None):
         if user_id is None and session_id is None:
