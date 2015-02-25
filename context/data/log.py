@@ -32,12 +32,10 @@ class Log(Data):
                     var item = this.items[i]
                     emit(
                         {
-                            _id: ObjectId(item._id),
-                            type: "result_listing"
+                            product_id: ObjectId(item._id)
                         },
                         {
-                            count: 1,
-                            stock: 0
+                            listing_count: 1
                         }
                     )
                 }
@@ -46,14 +44,14 @@ class Log(Data):
         reducer = Code("""
             function(key, values) {
                 var total = 0;
-                for(var i = 0; i < values.length; i++) {
-                    total += values[i].count;
-                }
+                values.forEach(function(value) {
+                    total += value.listing_count;
+                });
+
                 return {
-                    count: total
-                    stock: 0
+                    listing_count: total
                 };
-                return Array.sum(values);
+
             }
         """)
 
