@@ -35,13 +35,24 @@ class Log(Data):
                             _id: ObjectId(item._id),
                             type: "result_listing"
                         },
-                        1
+                        {
+                            count: 1,
+                            stock: 0
+                        }
                     )
                 }
             }
         """)
         reducer = Code("""
             function(key, values) {
+                var total = 0;
+                for(var i = 0; i < values.length; i++) {
+                    total += values[i].count;
+                }
+                return {
+                    count: total
+                    stock: 0
+                };
                 return Array.sum(values);
             }
         """)
