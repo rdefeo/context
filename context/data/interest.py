@@ -5,6 +5,7 @@ from context.data.data import Data
 from bson.code import Code
 from bson.son import SON
 from datetime import datetime
+from datetime import datetime, timedelta
 
 TYPE_HEART = "heart"
 TYPE_DETAIL = "detail"
@@ -80,3 +81,65 @@ class Interest(Data):
             },
             upsert=True
         )
+
+    def map_product_interests(self, now=datetime.now(), days_behind=30):
+        mapper = Code("""
+            function(){
+                emit (
+                    {
+                        product_id: ObjectId(this.product_id)
+                    },
+                    {
+                        detail_count: (this.type == "detail") ? 1 : 0,
+                        heart_count: (this.type == "heart") ? 1 : 0,
+                        total_count: 1
+                    }
+                )
+            }
+        """)
+        reducer = Code("""
+            function(key, values) {
+                var result = {
+                    detail_count: 0,
+                    heart_count: 0,
+                    total_count: 0
+                };
+                values.forEach(function(value) {
+                    result.detail_count += value.detail_count;
+                    result.heart_count += value.heart_count;
+                    result.total_count += value.total_count;
+                });
+
+                return result;
+
+            }
+        """)
+
+        timestamp = (now - timedelta(days=days_behind)).isoformat()
+
+        self.LOGGER.info("generate=product_interest,updated=%s,out=product_interest,action=replace,db=suggest", timestamp)
+
+        result = self.collection.map_reduce(
+            mapper,
+            reducer,
+            query={
+                "type": {
+                    "$in": [
+                        "detail",
+                        "heart"
+                    ]
+                },
+                "updated": {
+                    "$gte": timestamp
+                }
+            },
+            out=SON(
+                [
+                    ("replace", "product_interest"),
+                    ("db", "suggest")
+                ]
+            )
+
+        )
+
+        return result
