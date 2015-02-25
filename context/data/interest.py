@@ -90,6 +90,7 @@ class Interest(Data):
                         product_id: ObjectId(this.product_id)
                     },
                     {
+                        affiliate_redirect_count: (this.type == "affiliate_redirect") ? 1 : 0,
                         detail_count: (this.type == "detail") ? 1 : 0,
                         heart_count: (this.type == "heart") ? 1 : 0,
                         total_count: 1
@@ -100,11 +101,13 @@ class Interest(Data):
         reducer = Code("""
             function(key, values) {
                 var result = {
+                    affiliate_redirect_count: 0,
                     detail_count: 0,
                     heart_count: 0,
                     total_count: 0
                 };
                 values.forEach(function(value) {
+                    result.affiliate_redirect_count += value.affiliate_redirect_count;
                     result.detail_count += value.detail_count;
                     result.heart_count += value.heart_count;
                     result.total_count += value.total_count;
@@ -126,7 +129,8 @@ class Interest(Data):
                 "type": {
                     "$in": [
                         "detail",
-                        "heart"
+                        "heart",
+                        "affiliate_redirect"
                     ]
                 },
                 "updated": {
