@@ -17,3 +17,4 @@ class Status(RequestHandler):
         self.finish({
             "status": "OK"
         })
+

@@ -3,14 +3,14 @@ from tornado.web import url
 # from context.handlers.root import Root
 from context.handlers.root import Root
 from context.handlers.status import Status
-
+from context.contextualizer import Contextualizer
 __author__ = 'robdefeo'
 
 
 class Application(tornado.web.Application):
     def __init__(self):
         handlers = [
-            url(r"/", Root, name="root"),
+            url(r"/(.*)", Root, dict(contextualizer=Contextualizer()), name="root"),
             url(r"/status", Status, name="status")
         ]
 

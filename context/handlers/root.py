@@ -7,14 +7,21 @@ from context.contextualizer import Contextualizer
 
 
 class Root(RequestHandler):
-    def initialize(self):
-        pass
+    def initialize(self, contextualizer):
+        self.contextualizer = contextualizer
 
     def on_finish(self):
         pass
 
     @asynchronous
-    def post(self):
+    def get(self, context_id):
+        self.set_status(200)
+        self.finish(
+            self.contextualizer.cache[context_id]
+        )
+
+    @asynchronous
+    def post(self, nothing):
         user_id = self.get_argument("user_id", None)
         session_id = self.get_argument("session_id", None)
         body = tornado.escape.json_decode(self.request.body)
@@ -41,17 +48,17 @@ class Root(RequestHandler):
                 )
             )
         else:
-            contextualizer = Contextualizer()
-            context = contextualizer.contextualize(
+            context_id = self.contextualizer.create(
                 user_id,
                 session_id,
                 body["detection_result"] if "detection_result" in body else None
             )
 
+            self.add_header(
+                "Location",
+                "http://%s/%s" % (self.request.host, str(context_id))
+            )
             self.set_header('Content-Type', 'application/json')
-            self.set_status(200)
-            self.finish({
-                "context": context,
-                "version": "0.0.1"
-            })
+            self.set_status(201)
+            self.finish()
 
