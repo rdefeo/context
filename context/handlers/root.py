@@ -16,6 +16,8 @@ class Root(RequestHandler):
     @asynchronous
     def get(self, context_id):
         self.set_status(200)
+        hours = 600
+        self.set_header('Cache-Control', 'public,max-age=%d' % int(3600*hours))
         self.finish(
             self.contextualizer.cache[context_id]
         )
@@ -48,17 +50,23 @@ class Root(RequestHandler):
                 )
             )
         else:
-            context_id = self.contextualizer.create(
+            detection_response = None
+            if "detection_response" in body:
+                detection_response = body["detection_response"]
+
+            context = self.contextualizer.create(
                 user_id,
                 session_id,
-                body["detection_result"] if "detection_result" in body else None
+                detection_response
             )
 
             self.add_header(
                 "Location",
-                "http://%s/%s" % (self.request.host, str(context_id))
+                "http://%s/%s" % (self.request.host, str(context["_id"]))
             )
             self.set_header('Content-Type', 'application/json')
             self.set_status(201)
-            self.finish()
+            self.finish(
+                context
+            )
 
