@@ -1,9 +1,11 @@
 __author__ = 'robdefeo'
 from bson.objectid import ObjectId
 from cachetools import LRUCache
+from context.data.context import Context
+
 
 class Contextualizer(object):
-    def __init__(self, cache_maxsize=512):
+    def __init__(self, cache_maxsize=1024):
         self.cache = LRUCache(maxsize=cache_maxsize, missing=self.get_from_db)
         self._global_weightings = {
             "brand": 1.0,
@@ -16,7 +18,6 @@ class Contextualizer(object):
             "popular": 0.3,
             "added": 0.2
         }
-        # self.cache
 
     def get_global_weighting(self, _type):
         if _type in self._global_weightings:
@@ -25,9 +26,14 @@ class Contextualizer(object):
             return 0.3
 
     def get_from_db(self, context_id):
-        print (context_id)
-        raise NotImplemented()
-        pass
+        db = Context()
+        db.open_connection()
+        context = db.get(ObjectId(context_id))
+        db.close_connection()
+        context["_id"] = str(context["_id"])
+        context["session_id"] = str(context["session_id"])
+        context["detection_id"] = str(context["detection_id"]) if context["detection_id"] is not None else None
+        return context
 
     def create(self, new_context_id, user_id, session_id, detection_result):
         # TODO get global context from DB

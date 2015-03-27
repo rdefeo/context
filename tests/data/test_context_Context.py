@@ -5,6 +5,27 @@ from context.data.context import Context as Target
 from datetime import datetime
 
 
+class get_tests(TestCase):
+    def test_regular(self):
+        target = Target()
+        target.collection = Mock()
+        target.collection.find.return_value = ["first", "second"]
+        actual = target.get("_id_value")
+
+        self.assertEqual(
+            actual,
+            "first"
+        )
+
+        self.assertEqual(
+            target.collection.find.call_count,
+            1
+        )
+        self.assertDictEqual(
+            target.collection.find.call_args_list[0][0][0],
+            {'_id': '_id_value'}
+        )
+
 class insert_tests(TestCase):
     def test_regular(self):
         target = Target()
