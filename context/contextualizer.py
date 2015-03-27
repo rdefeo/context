@@ -1,6 +1,6 @@
 __author__ = 'robdefeo'
 from bson.objectid import ObjectId
-from cachetools import LRUCache, lru_cache
+from cachetools import LRUCache
 
 class Contextualizer(object):
     def __init__(self, cache_maxsize=512):
@@ -25,12 +25,13 @@ class Contextualizer(object):
             return 0.3
 
     def get_from_db(self, context_id):
+        print (context_id)
         raise NotImplemented()
         pass
 
-    def create(self, user_id, session_id, detection_result):
+    def create(self, new_context_id, user_id, session_id, detection_result):
         # TODO get global context from DB
-        new_context_id = ObjectId()
+
         context = {
             "_id": str(new_context_id)
         }

@@ -1,3 +1,4 @@
+from bson import ObjectId
 import tornado
 
 __author__ = 'robdefeo'
@@ -26,20 +27,10 @@ class Root(RequestHandler):
     def post(self, nothing):
         user_id = self.get_argument("user_id", None)
         session_id = self.get_argument("session_id", None)
+        locale = self.get_argument("locale", None)
         body = tornado.escape.json_decode(self.request.body)
 
-        if user_id is None:
-            self.set_status(412)
-            self.finish(
-                json_encode(
-                    {
-                        "status": "error",
-                        "message": "missing param=user_id"
-                    }
-                )
-            )
-
-        elif session_id is None:
+        if session_id is None:
             self.set_status(412)
             self.finish(
                 json_encode(
@@ -49,15 +40,28 @@ class Root(RequestHandler):
                     }
                 )
             )
+        elif locale is None:
+            self.set_status(412)
+            self.finish(
+                json_encode(
+                    {
+                        "status": "error",
+                        "message": "missing param=locale"
+                    }
+                )
+            )
         else:
             detection_response = None
             if "detection_response" in body:
                 detection_response = body["detection_response"]
 
+            new_context_id = ObjectId()
             context = self.contextualizer.create(
+                new_context_id,
                 user_id,
                 session_id,
                 detection_response
+
             )
 
             self.add_header(
@@ -66,7 +70,18 @@ class Root(RequestHandler):
             )
             self.set_header('Content-Type', 'application/json')
             self.set_status(201)
-            self.finish(
-                context
-            )
+            self.finish(context)
 
+            if self.get_argument("skip_mongodb_log", None) is None:
+                from context.data.context import Context
+                context_data = Context()
+                context_data.open_connection()
+                context_data.insert(
+                    context["entities"],
+                    locale,
+                    ObjectId(context["_id"]),
+                    ObjectId(session_id),
+                    user_id,
+                    ObjectId(detection_response["_id"]) if detection_response is not None else None
+                )
+                context_data.close_connection()
