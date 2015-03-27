@@ -15,7 +15,7 @@ class Context(Data):
             }
         )[0]
 
-    def insert(self, entities, locale, new_context_id, session_id, user_id, detection_id, now=None):
+    def insert(self, entities, locale, new_context_id, application_id, session_id, user_id, detection_id, now=None):
         if now is None:
             now = datetime.now()
 
@@ -27,6 +27,7 @@ class Context(Data):
                 "detection_id": detection_id,
                 "session_id": session_id,
                 "locale": locale,
-                "created": now.isoformat()
+                "created": now.isoformat(),
+                "application_id": application_id
             }
         )

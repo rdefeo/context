@@ -34,6 +34,7 @@ class insert_tests(TestCase):
             "entities_value",
             "locale_value",
             "new_context_id_value",
+            "application_id_value",
             "session_id",
             "user_id",
             "detection_id_value",
@@ -53,6 +54,7 @@ class insert_tests(TestCase):
                 'entities': 'entities_value',
                 'locale': 'locale_value',
                 'session_id': 'session_id',
+                'application_id': 'application_id_value',
                 'user_id': 'user_id'
             }
         )

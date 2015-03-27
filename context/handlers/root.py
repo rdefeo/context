@@ -27,10 +27,21 @@ class Root(RequestHandler):
     def post(self, nothing):
         user_id = self.get_argument("user_id", None)
         session_id = self.get_argument("session_id", None)
+        application_id = self.get_argument("application_id", None)
         locale = self.get_argument("locale", None)
         body = tornado.escape.json_decode(self.request.body)
 
-        if session_id is None:
+        if application_id is None:
+            self.set_status(412)
+            self.finish(
+                json_encode(
+                    {
+                        "status": "error",
+                        "message": "missing param=application_id"
+                    }
+                )
+            )
+        elif session_id is None:
             self.set_status(412)
             self.finish(
                 json_encode(
@@ -80,6 +91,7 @@ class Root(RequestHandler):
                     context["entities"],
                     locale,
                     ObjectId(context["_id"]),
+                    ObjectId(application_id),
                     ObjectId(session_id),
                     user_id,
                     ObjectId(detection_response["_id"]) if detection_response is not None else None
