@@ -4,7 +4,6 @@ import tornado
 __author__ = 'robdefeo'
 from tornado.web import RequestHandler, asynchronous
 from tornado.escape import json_encode
-from context.contextualizer import Contextualizer
 
 
 class Root(RequestHandler):
@@ -15,7 +14,8 @@ class Root(RequestHandler):
         pass
 
     @asynchronous
-    def get(self, context_id):
+    def get(self, *args, **kwargs):
+        context_id = self.get_argument("context_id", None)
         self.set_status(200)
         hours = 600
         self.set_header('Cache-Control', 'public,max-age=%d' % int(3600*hours))
@@ -24,7 +24,8 @@ class Root(RequestHandler):
         )
 
     @asynchronous
-    def post(self, nothing):
+    def post(self, *args, **kwargs):
+        self.set_header('Content-Type', 'application/json')
         user_id = self.get_argument("user_id", None)
         session_id = self.get_argument("session_id", None)
         application_id = self.get_argument("application_id", None)
@@ -79,7 +80,6 @@ class Root(RequestHandler):
                 "Location",
                 "http://%s/%s" % (self.request.host, str(context["_id"]))
             )
-            self.set_header('Content-Type', 'application/json')
             self.set_status(201)
             self.finish(context)
 

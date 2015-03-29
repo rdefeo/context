@@ -33,7 +33,7 @@ class Contextualizer(object):
         context["_id"] = str(context["_id"])
         context["session_id"] = str(context["session_id"])
         context["application_id"] = str(context["application_id"])
-        context["detection_id"] = str(context["detection_id"]) if context["detection_id"] is not None else None
+        context["detection_id"] = str(context["detection_id"]) if "detection_id" in context else None
         return context
 
     def create(self, new_context_id, user_id, session_id, detection_result):
