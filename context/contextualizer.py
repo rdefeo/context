@@ -1,3 +1,5 @@
+from context.settings import CONTEXT_CACHE_SIZE
+
 __author__ = 'robdefeo'
 from bson.objectid import ObjectId
 from cachetools import LRUCache
@@ -5,7 +7,7 @@ from context.data.context import Context
 
 
 class Contextualizer(object):
-    def __init__(self, cache_maxsize=1024):
+    def __init__(self, cache_maxsize=CONTEXT_CACHE_SIZE):
         self.cache = LRUCache(maxsize=cache_maxsize, missing=self.get_from_db)
         self._global_weightings = {
             "brand": 1.0,
@@ -56,7 +58,18 @@ class Contextualizer(object):
                 }
             ]
         elif detection_result is not None:
-            entities = []
+            entities = [
+                {
+                    "type": "popular",
+                    "key": "popular",
+                    "weighting": self.get_global_weighting("popular")
+                },
+                {
+                    "type": "added",
+                    "key": "added",
+                    "weighting": self.get_global_weighting("added")
+                }
+            ]
             for x in detection_result["detections"]:
                 entities.append(
                     {
