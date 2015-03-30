@@ -17,3 +17,5 @@ MONGODB_USER = get_env_setting("CONTEXT_MONGODB_USER", "context")
 MONGODB_PASSWORD = get_env_setting("CONTEXT_MONGODB_PASSWORD", "jemboo")
 
 PORT = int(get_env_setting("CONTEXT_PORT", 17999))
+
+VERSION = "0.0.1"

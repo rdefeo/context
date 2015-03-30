@@ -1,20 +1,19 @@
+import tornado
+from tornado.httpserver import HTTPServer
+from tornado.ioloop import IOLoop
+from context.application import Application
+import tornado.options
+
 __author__ = 'robdefeo'
-import sys
 
-from flask import Flask
+from context.settings import PORT
+tornado.options.define('port', type=int, default=PORT, help='server port number (default: 9000)')
+tornado.options.define('debug', type=bool, default=False, help='run in debug mode with autoreload (default: False)')
 
-app = Flask(__name__)
-
-from context.views.log import mod_log
-app.register_blueprint(mod_log)
-
-from context.views.interest import mod_interest
-app.register_blueprint(mod_interest)
-
-from context.views.root import mod_root
-app.register_blueprint(mod_root)
 
 if __name__ == "__main__":
-    from context.settings import PORT
-    # Run a test server.
-    app.run(host='0.0.0.0', port=PORT, debug=True)
+
+    tornado.options.parse_command_line()
+    http_server = HTTPServer(Application())
+    http_server.listen(tornado.options.options.port)
+    IOLoop.instance().start()
