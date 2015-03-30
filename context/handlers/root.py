@@ -93,7 +93,7 @@ class Root(RequestHandler):
                     ObjectId(context["_id"]),
                     ObjectId(application_id),
                     ObjectId(session_id),
-                    user_id,
+                    ObjectId(user_id) if user_id is not None else None,
                     ObjectId(detection_response["_id"]) if detection_response is not None else None
                 )
                 context_data.close_connection()

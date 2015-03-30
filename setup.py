@@ -12,7 +12,7 @@ setup(
     packages=[
         'context',
         'context.data',
-        'context.views',
+        'context.handlers',
     ],
     install_requires=required
 )

@@ -18,4 +18,6 @@ MONGODB_PASSWORD = get_env_setting("CONTEXT_MONGODB_PASSWORD", "jemboo")
 
 PORT = int(get_env_setting("CONTEXT_PORT", 17999))
 
+CONTEXT_CACHE_SIZE = int(get_env_setting("CONTEXT_CONTEXT_CACHE_SIZE", 2048))
+
 VERSION = "0.0.1"
