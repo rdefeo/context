@@ -1,7 +1,6 @@
 import logging
 
-from context.settings import (MONGODB_DB, MONGODB_HOST, MONGODB_PASSWORD,
-                             MONGODB_USER)
+from context.settings import MONGODB_DB, MONGODB_HOST, MONGODB_PASSWORD, MONGODB_USER
 from pymongo import MongoClient
 
 
