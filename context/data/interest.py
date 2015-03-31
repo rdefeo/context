@@ -120,7 +120,7 @@ class Interest(Data):
 
         timestamp = (now - timedelta(days=days_behind)).isoformat()
 
-        self.LOGGER.info("generate=product_interest,updated=%s,out=product_interest,action=replace,db=suggest", timestamp)
+        self.LOGGER.info("generate=product_interest,updated=%s,out=product_interest,action=replace,db=generate", timestamp)
 
         result = self.collection.map_reduce(
             mapper,
@@ -140,7 +140,7 @@ class Interest(Data):
             out=SON(
                 [
                     ("replace", "product_interest"),
-                    ("db", "suggest")
+                    ("db", "generate")
                 ]
             )
 

@@ -2,13 +2,13 @@ from distutils.core import setup
 import os
 import context
 from setuptools import setup
-
+from context import __version__
 with open('requirements.txt') as f:
     required = f.read().splitlines()
 
 setup(
     name='context',
-    version=context.__version__,
+    version=__version__,
     packages=[
         'context',
         'context.data',

@@ -57,7 +57,7 @@ class Log(Data):
 
         timestamp = (now - timedelta(days=days_behind)).isoformat()
 
-        self.LOGGER.info("generate=product_result_listing,timestamp=%s,out=product_result_listing,action=replace,db=suggest", timestamp)
+        self.LOGGER.info("generate=product_result_listing,timestamp=%s,out=product_result_listing,action=replace,db=generate", timestamp)
 
         result = self.collection.map_reduce(
             mapper,
@@ -71,7 +71,7 @@ class Log(Data):
             out=SON(
                 [
                     ("replace", "product_result_listing"),
-                    ("db", "suggest")
+                    ("db", "generate")
                 ]
             )
 
