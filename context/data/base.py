@@ -1,3 +1,4 @@
+from __future__ import absolute_import
 import logging
 
 from context.settings import MONGODB_DB, MONGODB_HOST, MONGODB_PASSWORD, MONGODB_USER
