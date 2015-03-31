@@ -5,7 +5,7 @@ from context.settings import (MONGODB_DB, MONGODB_HOST, MONGODB_PASSWORD,
 from pymongo import MongoClient
 
 
-class Data(object):
+class Base(object):
     LOGGER = logging.getLogger(__name__)
     collection = None
     collection_name = None

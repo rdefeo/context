@@ -1,11 +1,12 @@
 from datetime import datetime
 import logging
 import context
-from context.data.data import Data
+from context.data.base import Base
 
 __author__ = 'robdefeo'
 
-class Context(Data):
+
+class Context(Base):
     LOGGER = logging.getLogger(__name__)
     collection_name = "context"
 

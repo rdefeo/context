@@ -1,7 +1,7 @@
 import logging
 
 import pymongo
-from context.data.data import Data
+from context.data.base import Base
 from bson.code import Code
 from bson.son import SON
 from datetime import datetime
@@ -13,7 +13,7 @@ TYPE_REMOVE = "remove"
 TYPE_AFFILIATE_REDIRECT = "affiliate_redirect"
 
 
-class Interest(Data):
+class Interest(Base):
     LOGGER = logging.getLogger(__name__)
     collection_name = "interests"
 

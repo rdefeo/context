@@ -2,13 +2,13 @@ __author__ = 'robdefeo'
 import logging
 
 import pymongo
-from context.data.data import Data
+from context.data.base import Base
 from bson.code import Code
 from bson.son import SON
 from datetime import datetime, timedelta
 
 
-class Log(Data):
+class Log(Base):
     LOGGER = logging.getLogger(__name__)
     collection_name = "logs"
 

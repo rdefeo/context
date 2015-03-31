@@ -2,12 +2,12 @@ from datetime import datetime
 import logging
 from pkg_resources import VERSION
 import context
-from context.data.data import Data
+from context.data.base import Base
 
 __author__ = 'robdefeo'
 
 
-class Feedback(Data):
+class Feedback(Base):
     LOGGER = logging.getLogger(__name__)
     collection_name = "feedback"
 
