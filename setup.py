@@ -1,6 +1,3 @@
-from distutils.core import setup
-import os
-import context
 from setuptools import setup
 from context import __version__
 with open('requirements.txt') as f:
