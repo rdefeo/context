@@ -49,12 +49,14 @@ class Contextualizer(object):
                 {
                     "type": "popular",
                     "key": "popular",
-                    "weighting": self.get_global_weighting("popular")
+                    "weighting": self.get_global_weighting("popular"),
+                    "source": "default"
                 },
                 {
                     "type": "added",
                     "key": "added",
-                    "weighting": self.get_global_weighting("added")
+                    "weighting": self.get_global_weighting("added"),
+                    "source": "default"
                 }
             ]
         elif detection_result is not None:
@@ -62,22 +64,39 @@ class Contextualizer(object):
                 {
                     "type": "popular",
                     "key": "popular",
-                    "weighting": self.get_global_weighting("popular")
+                    "weighting": self.get_global_weighting("popular"),
+                    "source": "default"
                 },
                 {
                     "type": "added",
                     "key": "added",
-                    "weighting": self.get_global_weighting("added")
+                    "weighting": self.get_global_weighting("added"),
+                    "source": "default"
                 }
             ]
-            for x in detection_result["detections"]:
-                entities.append(
-                    {
-                        "key": x["key"],
-                        "type": x["type"],
-                        "weighting": self.get_global_weighting("type")
-                    }
-                )
+            for outcome in detection_result["outcomes"]:
+                # if x["confidence"] > 0.6:
+                for x in outcome["entities"]:
+                    if any(x["disambiguated_outcomes"]):
+                        weighting = self.get_global_weighting(x["type"])
+                        if outcome["intent"] == "exclude":
+                            weighting *= -1
+                        entity = {
+                            "key": x["key"],
+                            "type": x["type"],
+                            "weighting": weighting,
+                            "source": "detection"
+                        }
+                        entities.append(entity)
+            # for x in detection_result["detections"]:
+            #     entity = {
+            #         "key": x["key"],
+            #         "type": x["type"],
+            #         "weighting": self.get_global_weighting(x["type"]),
+            #         "source": "detection"
+            #     }
+            #     entities.append(entity)
+
             context["entities"] = entities
         else:
             raise NotImplemented("")
