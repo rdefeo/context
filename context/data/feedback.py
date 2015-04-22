@@ -46,7 +46,7 @@ class Feedback(Base):
                     },
                     {
                         affiliate_redirect_count: (this.type == "affiliate_redirect") ? 1 : 0,
-                        detail_count: (this.type == "detail") ? 1 : 0,
+                        detail_count: (this.type == "details") ? 1 : 0,
                         heart_count: (this.type == "heart") ? 1 : 0,
                         total_count: 1
                     }
@@ -83,7 +83,7 @@ class Feedback(Base):
             query={
                 "type": {
                     "$in": [
-                        "detail",
+                        "details",
                         "heart",
                         "affiliate_redirect"
                     ]
