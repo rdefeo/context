@@ -88,7 +88,7 @@ class Feedback(Base):
                         "affiliate_redirect"
                     ]
                 },
-                "updated": {
+                "created": {
                     "$gte": timestamp
                 }
             },
