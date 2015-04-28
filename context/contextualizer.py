@@ -77,8 +77,9 @@ class Contextualizer(object):
             for outcome in detection_result["outcomes"]:
                 # if x["confidence"] > 0.6:
                 for x in outcome["entities"]:
-                    if any(x["disambiguated_outcomes"]):
+                    if x["confidence"] > 0.7:
                         weighting = self.get_global_weighting(x["type"])
+                        weighting *= x["confidence"]
                         if outcome["intent"] == "exclude":
                             weighting *= -1
                         entity = {
