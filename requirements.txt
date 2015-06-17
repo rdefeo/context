@@ -1,5 +1,6 @@
 pymongo>=2.7.2
 tornado>=4.0
-numpy>=1.9.0
+# do this in the chef script instead numpy>=1.9.1
 mock>=1.0.1
 cachetools>=1.0.0
+pyslack>=0.1.0
