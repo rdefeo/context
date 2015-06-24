@@ -60,20 +60,7 @@ class Contextualizer(object):
                 }
             ]
         elif detection_result is not None:
-            entities = [
-                {
-                    "type": "popular",
-                    "key": "popular",
-                    "weighting": self.get_global_weighting("popular"),
-                    "source": "default"
-                },
-                {
-                    "type": "added",
-                    "key": "added",
-                    "weighting": self.get_global_weighting("added"),
-                    "source": "default"
-                }
-            ]
+            entities = []
             for outcome in detection_result["outcomes"]:
                 # if x["confidence"] > 0.6:
                 for x in outcome["entities"]:
