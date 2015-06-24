@@ -35,7 +35,7 @@ class insert_tests(TestCase):
                 'application_id': 'application_id_value',
                 'user_id': 'user_id',
                 'meta_data': 'meta_data_value',
-                'version': '0.0.1'
+                'version': '0.0.2'
             }
         )
 
@@ -67,7 +67,7 @@ class insert_tests(TestCase):
                 'session_id': 'session_id',
                 'application_id': 'application_id_value',
                 'meta_data': 'meta_data_value',
-                'version': '0.0.1'
+                'version': '0.0.2'
             }
         )
 
@@ -99,7 +99,7 @@ class insert_tests(TestCase):
                 'session_id': 'session_id',
                 'application_id': 'application_id_value',
                 'user_id': 'user_id',
-                'version': '0.0.1'
+                'version': '0.0.2'
             }
         )
 
@@ -130,7 +130,7 @@ class insert_tests(TestCase):
                 'session_id': 'session_id',
                 'application_id': 'application_id_value',
                 'user_id': 'user_id',
-                'version': '0.0.1',
+                'version': '0.0.2',
                 'meta_data': 'meta_data_value'
             }
         )

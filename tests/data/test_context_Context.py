@@ -56,7 +56,7 @@ class insert_tests(TestCase):
                 'session_id': 'session_id',
                 'application_id': 'application_id_value',
                 'user_id': 'user_id',
-                'version': "0.0.1"
+                'version': "0.0.2"
             }
         )
 
@@ -88,7 +88,7 @@ class insert_tests(TestCase):
                 'session_id': 'session_id',
                 'application_id': 'application_id_value',
                 'detection_id': 'detection_id_value',
-                'version': '0.0.1'
+                'version': '0.0.2'
             }
         )
 
@@ -120,6 +120,6 @@ class insert_tests(TestCase):
                 'session_id': 'session_id',
                 'application_id': 'application_id_value',
                 'user_id': 'user_id',
-                'version': '0.0.1'
+                'version': '0.0.2'
             }
         )
