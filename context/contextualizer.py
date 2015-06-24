@@ -10,22 +10,22 @@ class Contextualizer(object):
     def __init__(self, cache_maxsize=CONTEXT_CACHE_SIZE):
         self.cache = LRUCache(maxsize=cache_maxsize, missing=self.get_from_db)
         self._global_weightings = {
-            "brand": 1.0,
-            "theme": 0.8,
-            "style": 0.7,
-            "color": 0.6,
-            "detail": 0.6,
-            "material": 0.5,
-            "season": 0.4,
-            "popular": 0.3,
-            "added": 0.2
+            "brand": 100.0,
+            "theme": 80.0,
+            "style": 70.0,
+            "color": 60.0,
+            "detail": 60.0,
+            "material": 50.0,
+            "season": 40.0,
+            "popular": 30.0,
+            "added": 20.0
         }
 
     def get_global_weighting(self, _type):
         if _type in self._global_weightings:
             return self._global_weightings[_type]
         else:
-            return 0.3
+            return 30.0
 
     def get_from_db(self, context_id):
         db = Context()
@@ -62,13 +62,12 @@ class Contextualizer(object):
         elif detection_result is not None:
             entities = []
             for outcome in detection_result["outcomes"]:
-                # if x["confidence"] > 0.6:
                 for x in outcome["entities"]:
-                    if x["confidence"] > 0.7:
+                    if x["confidence"] > 70.0:
                         weighting = self.get_global_weighting(x["type"])
-                        weighting *= x["confidence"]
+                        weighting *= (x["confidence"] / 100)
                         if outcome["intent"] == "exclude":
-                            weighting *= -1
+                            weighting *= -100
                         entity = {
                             "key": x["key"],
                             "type": x["type"],
