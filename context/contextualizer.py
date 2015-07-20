@@ -11,12 +11,12 @@ class Contextualizer(object):
         self.cache = LRUCache(maxsize=cache_maxsize, missing=self.get_from_db)
         self._global_weightings = {
             "brand": 100.0,
-            "theme": 80.0,
-            "style": 70.0,
-            "color": 60.0,
+            "color": 90.0,
+            "style": 80.0,
+            "theme": 70.0,
+            "season": 70.0,
             "detail": 60.0,
             "material": 50.0,
-            "season": 40.0,
             "popular": 30.0,
             "added": 20.0
         }
