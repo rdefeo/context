@@ -12,18 +12,12 @@ class get_tests(TestCase):
         target.collection.find.return_value = ["first", "second"]
         actual = target.get("_id_value")
 
-        self.assertEqual(
-            actual,
-            "first"
-        )
+        self.assertEqual("first", actual)
 
-        self.assertEqual(
-            target.collection.find.call_count,
-            1
-        )
+        self.assertEqual(1, target.collection.find.call_count)
         self.assertDictEqual(
-            target.collection.find.call_args_list[0][0][0],
-            {'_id': '_id_value'}
+            {'_id': '_id_value'},
+            target.collection.find.call_args_list[0][0][0]
         )
 
 class insert_tests(TestCase):
@@ -41,12 +35,8 @@ class insert_tests(TestCase):
             datetime(2000, 1, 1)
         )
 
-        self.assertEqual(
-            target.collection.insert.call_count,
-            1
-        )
+        self.assertEqual(1, target.collection.insert.call_count)
         self.assertDictEqual(
-            target.collection.insert.call_args_list[0][0][0],
             {
                 '_id': 'new_context_id_value',
                 'created': '2000-01-01T00:00:00',
@@ -57,7 +47,8 @@ class insert_tests(TestCase):
                 'application_id': 'application_id_value',
                 'user_id': 'user_id',
                 'version': "0.0.2"
-            }
+            },
+            target.collection.insert.call_args_list[0][0][0]
         )
 
     def test_none_user_id(self):
@@ -74,12 +65,8 @@ class insert_tests(TestCase):
             datetime(2000, 1, 1)
         )
 
-        self.assertEqual(
-            target.collection.insert.call_count,
-            1
-        )
+        self.assertEqual(1, target.collection.insert.call_count)
         self.assertDictEqual(
-            target.collection.insert.call_args_list[0][0][0],
             {
                 '_id': 'new_context_id_value',
                 'created': '2000-01-01T00:00:00',
@@ -89,7 +76,8 @@ class insert_tests(TestCase):
                 'application_id': 'application_id_value',
                 'detection_id': 'detection_id_value',
                 'version': '0.0.2'
-            }
+            },
+            target.collection.insert.call_args_list[0][0][0]
         )
 
     def test_none_detection_id(self):
@@ -106,12 +94,8 @@ class insert_tests(TestCase):
             datetime(2000, 1, 1)
         )
 
-        self.assertEqual(
-            target.collection.insert.call_count,
-            1
-        )
+        self.assertEqual(1, target.collection.insert.call_count)
         self.assertDictEqual(
-            target.collection.insert.call_args_list[0][0][0],
             {
                 '_id': 'new_context_id_value',
                 'created': '2000-01-01T00:00:00',
@@ -121,5 +105,6 @@ class insert_tests(TestCase):
                 'application_id': 'application_id_value',
                 'user_id': 'user_id',
                 'version': '0.0.2'
-            }
+            },
+            target.collection.insert.call_args_list[0][0][0]
         )

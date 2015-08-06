@@ -17,8 +17,8 @@ class Root(RequestHandler):
     def get(self, *args, **kwargs):
         context_id = self.get_argument("context_id", None)
         self.set_status(200)
-        hours = 600
-        self.set_header('Cache-Control', 'public,max-age=%d' % int(3600*hours))
+        # hours = 600
+        # self.set_header('Cache-Control', 'public,max-age=%d' % int(3600*hours))
         self.finish(
             self.contextualizer.cache[context_id]
         )
