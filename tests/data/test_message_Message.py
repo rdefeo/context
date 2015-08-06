@@ -7,6 +7,22 @@ from context.data.message import Direction, Message as Target
 from datetime import datetime
 
 
+class get_tests(TestCase):
+    def test_regular(self):
+        target = Target()
+        target.collection = Mock()
+        target.collection.find.return_value = ["first", "second"]
+        actual = target.find(ObjectId("012345678901234567890123"))
+
+        self.assertListEqual(['first', 'second'], actual)
+
+        self.assertEqual(1, target.collection.find.call_count)
+        self.assertDictEqual(
+            {'context_id': ObjectId('012345678901234567890123')},
+            target.collection.find.call_args_list[0][0][0]
+        )
+
+
 class update_tests(TestCase):
     def test_regular(self):
         target = Target()
