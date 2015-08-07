@@ -19,14 +19,12 @@ class Message(Base):
     LOGGER = logging.getLogger(__name__)
     collection_name = "message"
 
-    def find(self, context_id: ObjectId=None):
+    def find(self, context_id: ObjectId=None) -> list(dict):
         query = {}
         if context_id is not None:
             query["context_id"] = context_id
-
         if not any(query):
             raise Exception("No parameters")
-
         return list(self.collection.find(query))
 
     def insert(self, context_id: ObjectId, direction: Direction, text: str, detection_id: ObjectId=None, now: datetime=None):
