@@ -50,16 +50,18 @@ class insert_tests(TestCase):
     def test_regular(self):
         target = Target()
         target.collection = Mock()
-        target.insert(
+        actual = target.insert(
             ObjectId("012345678901234567890123"),
             Direction.IN,
             "text_value",
-            now=datetime(2000, 1, 1)
+            now=datetime(2000, 1, 1),
+            _id=ObjectId('992345678901234567890123')
         )
 
         self.assertEqual(1, target.collection.insert.call_count)
         self.assertDictEqual(
             {
+                '_id': ObjectId('992345678901234567890123'),
                 'context_id': ObjectId('012345678901234567890123'),
                 'updated': '2000-01-01T00:00:00',
                 'created': '2000-01-01T00:00:00',
@@ -70,21 +72,28 @@ class insert_tests(TestCase):
             target.collection.insert.call_args_list[0][0][0]
         )
 
+        self.assertEqual(
+            ObjectId('992345678901234567890123'),
+            actual
+        )
+
     def test_with_detection_id(self):
         target = Target()
         target.collection = Mock()
-        target.insert(
+        actual = target.insert(
             ObjectId("012345678901234567890123"),
             Direction.IN,
             "text_value",
             detection_id=ObjectId("A12345678901234567890123"),
-            now=datetime(2000, 1, 1)
+            now=datetime(2000, 1, 1),
+            _id=ObjectId('992345678901234567890123')
         )
 
         self.assertEqual(1, target.collection.insert.call_count)
 
         self.assertDictEqual(
             {
+                '_id': ObjectId('992345678901234567890123'),
                 'context_id': ObjectId('012345678901234567890123'),
                 'detection_id': ObjectId('a12345678901234567890123'),
                 'updated': '2000-01-01T00:00:00',
@@ -95,3 +104,10 @@ class insert_tests(TestCase):
             },
             target.collection.insert.call_args_list[0][0][0]
         )
+
+        self.assertEqual(
+            ObjectId('992345678901234567890123'),
+            actual
+        )
+
+

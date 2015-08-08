@@ -13,6 +13,7 @@ class Application(tornado.web.Application):
         application_handlers = [
             url(r"/", Root, dict(contextualizer=Contextualizer()), name="root"),
             url(r"/(.*)/messages", handlers.MessagesHandler, name="messages"),
+            url(r"/(.*)/messages/", handlers.MessageHandler, name="message"),
             url(r"/feedback", handlers.FeedbackHandler, name="feedback"),
             url(r"/status", handlers.StatusHandler, name="status")
         ]
