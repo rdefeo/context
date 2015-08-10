@@ -79,6 +79,9 @@ class Context(Base):
             {
                 "$push": {
                     "messages": data
+                },
+                "$set": {
+                    "_ver": _id
                 }
             }
         )

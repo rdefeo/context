@@ -204,7 +204,8 @@ class insert_message_tests(TestCase):
                         'direction': 1,
                         'version': "0.0.2"
                     }
-                }
+                },
+                '$set': {'_ver': ObjectId('992345678901234567890123')}
             },
             target.collection.update.call_args_list[0][0][1]
         )
@@ -246,7 +247,8 @@ class insert_message_tests(TestCase):
                         'direction': 1,
                         'version': "0.0.2"
                     }
-                }
+                },
+                '$set': {'_ver': ObjectId('992345678901234567890123')}
             },
             target.collection.update.call_args_list[0][0][1]
         )
