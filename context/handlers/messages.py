@@ -40,6 +40,7 @@ class Message(RequestHandler):
         try:
             body = json_decode(self.request.body)
         except:
+            self.set_status(412)
             self.finish(
                 json_encode(
                     {
@@ -54,7 +55,7 @@ class Message(RequestHandler):
             raw_direction = body["direction"] if "direction" in body else None
             direction = data.MessageDirection(int(raw_direction))
         except:
-
+            self.set_status(412)
             self.finish(
                 json_encode(
                     {

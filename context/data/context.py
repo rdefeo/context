@@ -13,8 +13,8 @@ __author__ = 'robdefeo'
 
 @unique
 class MessageDirection(Enum):
-    IN = 1
-    OUT = 0
+    IN = 1 # User
+    OUT = 0 # Jemboo
 
 
 class Context(Base):

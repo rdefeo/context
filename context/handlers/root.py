@@ -42,6 +42,7 @@ class Root(RequestHandler):
                     }
                 )
             )
+            return None
         elif session_id is None:
             self.set_status(412)
             self.finish(
@@ -52,6 +53,7 @@ class Root(RequestHandler):
                     }
                 )
             )
+            return None
         elif locale is None:
             self.set_status(412)
             self.finish(
@@ -62,38 +64,95 @@ class Root(RequestHandler):
                     }
                 )
             )
-        else:
-            detection_response = None
-            if "detection_response" in body:
-                detection_response = body["detection_response"]
+            return None
 
-            new_context_id = ObjectId()
-            context = self.contextualizer.create(
-                new_context_id,
-                user_id,
-                session_id,
-                detection_response
+        detection_response = None
+        if "detection_response" in body:
+            detection_response = body["detection_response"]
 
-            )
+        new_context_id = ObjectId()
+        context = self.contextualizer.create(
+            new_context_id,
+            user_id,
+            session_id,
+            detection_response
 
-            self.add_header(
-                "Location",
-                "http://%s/%s" % (self.request.host, str(context["_id"]))
-            )
-            self.set_status(201)
-            self.finish(context)
+        )
 
-            if self.get_argument("skip_mongodb_log", None) is None:
-                from context.data.context import Context
-                context_data = Context()
-                context_data.open_connection()
-                context_data.insert(
-                    context["entities"],
-                    locale,
-                    ObjectId(context["_id"]),
-                    ObjectId(application_id),
-                    ObjectId(session_id),
-                    ObjectId(user_id) if user_id is not None else None,
-                    ObjectId(detection_response["_id"]) if detection_response is not None else None
+        self.add_header(
+            "Location",
+            "http://%s/%s" % (self.request.host, str(context["_id"]))
+        )
+        try:
+            db_application_id = ObjectId(application_id)
+        except:
+            self.set_status(412)
+            self.finish(
+                json_encode(
+                    {
+                        "status": "error",
+                        "message": "invalid param=application_id,application_id=%s" % application_id
+                    }
                 )
-                context_data.close_connection()
+            )
+            return
+
+        try:
+            db_session_id = ObjectId(session_id)
+        except:
+            self.set_status(412)
+            self.finish(
+                json_encode(
+                    {
+                        "status": "error",
+                        "message": "invalid param=session_id,session_id=%s" % session_id
+                    }
+                )
+            )
+            return
+
+        try:
+            db_user_id = ObjectId(user_id) if user_id is not None else None
+        except:
+            self.set_status(412)
+            self.finish(
+                json_encode(
+                    {
+                        "status": "error",
+                        "message": "invalid param=user_id,user_id=%s" % user_id
+                    }
+                )
+            )
+            return
+
+        try:
+            db_detection_id = ObjectId(detection_response["_id"]) if detection_response is not None else None
+        except:
+            self.set_status(412)
+            self.finish(
+                json_encode(
+                    {
+                        "status": "error",
+                        "message": "invalid param=detection_response_id,user_id=%s" % detection_response["_id"]
+                    }
+                )
+            )
+            return
+
+        if self.get_argument("skip_mongodb_log", None) is None:
+            from context.data.context import Context
+            context_data = Context()
+            context_data.open_connection()
+            context_data.insert(
+                context["entities"],
+                locale,
+                ObjectId(context["_id"]),
+                db_application_id,
+                db_session_id,
+                db_user_id,
+                db_detection_id
+            )
+            context_data.close_connection()
+
+        self.set_status(201)
+        self.finish(context)
