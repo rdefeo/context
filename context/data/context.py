@@ -39,7 +39,8 @@ class Context(Base):
             "locale": locale,
             "created": now.isoformat(),
             "application_id": application_id,
-            "version": __version__
+            "version": __version__,
+            "_ver": new_context_id
         }
         if user_id is not None:
             record["user_id"] = user_id
@@ -47,6 +48,11 @@ class Context(Base):
             record["detection_id"] = detection_id
 
         self.collection.insert(record)
+
+        return {
+            "_id": new_context_id,
+            "_ver": new_context_id
+        }
 
     def insert_message(self, context_id: ObjectId, direction: MessageDirection, text: str, detection_id: ObjectId=None,
                     _id: ObjectId=None, now: datetime=None) -> ObjectId:

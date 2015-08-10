@@ -27,7 +27,7 @@ class insert_tests(TestCase):
     def test_regular(self):
         target = Target()
         target.collection = Mock()
-        target.insert(
+        actual = target.insert(
             "entities_value",
             "locale_value",
             "new_context_id_value",
@@ -36,6 +36,11 @@ class insert_tests(TestCase):
             "user_id",
             "detection_id_value",
             datetime(2000, 1, 1)
+        )
+
+        self.assertDictEqual(
+            {'_ver': 'new_context_id_value', '_id': 'new_context_id_value'},
+            actual
         )
 
         self.assertEqual(1, target.collection.insert.call_count)
@@ -49,6 +54,7 @@ class insert_tests(TestCase):
                 'session_id': 'session_id',
                 'application_id': 'application_id_value',
                 'user_id': 'user_id',
+                '_ver': 'new_context_id_value',
                 'version': "0.0.2"
             },
             target.collection.insert.call_args_list[0][0][0]
@@ -57,7 +63,7 @@ class insert_tests(TestCase):
     def test_none_user_id(self):
         target = Target()
         target.collection = Mock()
-        target.insert(
+        actual = target.insert(
             "entities_value",
             "locale_value",
             "new_context_id_value",
@@ -66,6 +72,11 @@ class insert_tests(TestCase):
             None,
             "detection_id_value",
             datetime(2000, 1, 1)
+        )
+
+        self.assertDictEqual(
+            {'_ver': 'new_context_id_value', '_id': 'new_context_id_value'},
+            actual
         )
 
         self.assertEqual(1, target.collection.insert.call_count)
@@ -78,6 +89,7 @@ class insert_tests(TestCase):
                 'session_id': 'session_id',
                 'application_id': 'application_id_value',
                 'detection_id': 'detection_id_value',
+                '_ver': 'new_context_id_value',
                 'version': '0.0.2'
             },
             target.collection.insert.call_args_list[0][0][0]
@@ -86,7 +98,7 @@ class insert_tests(TestCase):
     def test_none_detection_id(self):
         target = Target()
         target.collection = Mock()
-        target.insert(
+        actual = target.insert(
             "entities_value",
             "locale_value",
             "new_context_id_value",
@@ -95,6 +107,11 @@ class insert_tests(TestCase):
             "user_id",
             None,
             datetime(2000, 1, 1)
+        )
+
+        self.assertDictEqual(
+            {'_ver': 'new_context_id_value', '_id': 'new_context_id_value'},
+            actual
         )
 
         self.assertEqual(1, target.collection.insert.call_count)
@@ -107,6 +124,7 @@ class insert_tests(TestCase):
                 'session_id': 'session_id',
                 'application_id': 'application_id_value',
                 'user_id': 'user_id',
+                '_ver': 'new_context_id_value',
                 'version': '0.0.2'
             },
             target.collection.insert.call_args_list[0][0][0]
