@@ -6,7 +6,7 @@ from tornado.web import RequestHandler, asynchronous
 from tornado.escape import json_encode
 
 
-class Root(RequestHandler):
+class Context(RequestHandler):
     def initialize(self, contextualizer):
         self.contextualizer = contextualizer
 
