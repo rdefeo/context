@@ -2,15 +2,20 @@ from bson import ObjectId
 from tornado.escape import json_decode, json_encode
 from tornado.gen import engine
 from tornado.web import RequestHandler, asynchronous
+from bson.json_util import dumps
 
 from context import data, __version__
-from context.data.message import Direction
 
 
 class Message(RequestHandler):
+    context_data = None
+
+    def data_received(self, chunk):
+        pass
+
     def initialize(self):
-        self.messages_data = data.MessageData()
-        self.messages_data.open_connection()
+        self.context_data = data.ContextData()
+        self.context_data.open_connection()
 
     def on_finish(self):
         pass
@@ -46,13 +51,15 @@ class Message(RequestHandler):
             return
 
         try:
-            direction = Direction(body["direction"])
+            raw_direction = body["direction"] if "direction" in body else None
+            direction = data.MessageDirection(int(raw_direction))
         except:
+
             self.finish(
                 json_encode(
                     {
                         "status": "error",
-                        "message": "invalid direction,direction=%s" % body["direction"]
+                        "message": "invalid direction,direction=%s" % raw_direction
                     }
                 )
             )
@@ -66,13 +73,13 @@ class Message(RequestHandler):
                 json_encode(
                     {
                         "status": "error",
-                        "message": "invalid param=detection_id,detection_id=%s" % detection_id
+                        "message": "invalid param=detection_id,detection_id=%s" % body["detection_id"]
                     }
                 )
             )
             return
 
-        message_id = self.messages_data.insert(
+        message_id = self.context_data.insert_message(
             db_context_id,
             direction,
             body["text"],
@@ -80,12 +87,18 @@ class Message(RequestHandler):
         )
         self.set_status(201)
         self.set_header("Location", "/%s/messages/%s" % (context_id, message_id))
+        self.finish()
 
 
 class Messages(RequestHandler):
+    context_data = None
+
+    def data_received(self, chunk):
+        pass
+
     def initialize(self):
-        self.messages_data = data.MessageData()
-        self.messages_data.open_connection()
+        self.context_data = data.ContextData()
+        self.context_data.open_connection()
 
     def on_finish(self):
         pass
@@ -94,14 +107,17 @@ class Messages(RequestHandler):
     @engine
     def get(self, context_id, *args, **kwargs):
         db_context_id = ObjectId(context_id)
-        db_messages = self.messages_data.find(context_id=db_context_id)
+        db_messages = self.context_data.find_messages(context_id=db_context_id)
 
         self.set_status(200)
+        self.set_header("Content-Type", "application/json")
         self.finish(
-            {
-                "messages": db_messages,
-                "version": __version__
-            }
+            dumps(
+                {
+                    "messages": db_messages,
+                    "version": __version__
+                }
+            )
         )
 
         # hours = 600

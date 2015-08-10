@@ -1,3 +1,4 @@
 __author__ = 'robdefeo'
 
-from .message import Message as MessageData
+from .context import Context as ContextData, MessageDirection
+
