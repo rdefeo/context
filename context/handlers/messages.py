@@ -16,6 +16,8 @@ class Message(RequestHandler):
         pass
 
     def initialize(self):
+        from context.contextualizer import Contextualizer
+        self.contextualizer = Contextualizer()
         self.context_data = data.ContextData()
         self.context_data.open_connection()
         self.message_data = data.MessageData()
@@ -27,19 +29,26 @@ class Message(RequestHandler):
     @asynchronous
     @engine
     def post(self, context_id, *args, **kwargs):
-        message_id = self.message_data.insert(
+        # TODO get existing context here
+        message = self.message_data.insert(
             self.path_context_id(context_id),
             self.body_direction(),
             self.body_text(),
             detection=self.body_detection()
         )
 
-        _ver = self.context_data.update(self.path_context_id(context_id), message_id)
+        # TODO expect ver to more efficiently get messages
+
+        # TODO get messages
+
+        # TODO calculate new context
+        _ver = message["_id"]
+        self.contextualizer.update(self.path_context_id(context_id), _ver, [message])
 
         self.set_status(201)
-        self.set_header("Location", "/%s/messages/%s" % (context_id, message_id))
-        self.set_header("_id", str(message_id))
-        self.set_header("_ver", str(_ver))
+        self.set_header("Location", "/%s/messages/%s" % (context_id, message["_id"]))
+        self.set_header("_id", str(message["_id"]))
+        self.set_header("_rev", str(_ver))
         self.finish()
 
     def path_context_id(self, context_id) -> ObjectId:
@@ -123,7 +132,6 @@ class Messages(RequestHandler):
     @asynchronous
     @engine
     def get(self, context_id, *args, **kwargs):
-
         db_messages = self.message_data.find(context_id=self.path_context_id(context_id))
 
         self.set_status(200)

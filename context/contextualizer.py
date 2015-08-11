@@ -1,13 +1,14 @@
 from context.settings import CONTEXT_CACHE_SIZE
-
-__author__ = 'robdefeo'
 from bson.objectid import ObjectId
 from cachetools import LRUCache
 from context.data.context import Context
+from context.data import MessageDirection, ContextData
 
 
 class Contextualizer(object):
     def __init__(self, cache_maxsize=CONTEXT_CACHE_SIZE):
+        self.context_data = ContextData()
+        self.context_data.open_connection()
         self.cache = LRUCache(maxsize=cache_maxsize, missing=self.get_from_db)
         self._global_weightings = {
             "brand": 100.0,
@@ -38,87 +39,44 @@ class Contextualizer(object):
         context["detection_id"] = str(context["detection_id"]) if "detection_id" in context else None
         return context
 
-    def create(self, new_context_id: ObjectId, user_id: ObjectId, session_id: ObjectId):
-        context = {
-            "_id": new_context_id,
-            "entities": [
-                {
-                    "type": "popular",
-                    "key": "popular",
-                    "weighting": self.get_global_weighting("popular"),
-                    "source": "default"
-                },
-                {
-                    "type": "added",
-                    "key": "added",
-                    "weighting": self.get_global_weighting("added"),
-                    "source": "default"
-                }
-            ]
-        }
+    def create(self, user_id: ObjectId, session_id: ObjectId):
+        return [
+            {
+                "type": "popular",
+                "key": "popular",
+                "weighting": self.get_global_weighting("popular"),
+                "source": "default"
+            },
+            {
+                "type": "added",
+                "key": "added",
+                "weighting": self.get_global_weighting("added"),
+                "source": "default"
+            }
+        ]
 
-        return context
+    def update(self, context_id: ObjectId, _rev:ObjectId, messages:list):
+        in_messages = (x for x in messages if x["direction"] == MessageDirection.IN)
+        last_in_message = next(in_messages, None)
+        entities = []
+        if last_in_message is not None:
+            for outcome in last_in_message["outcomes"]:
+                for x in outcome["entities"]:
+                    if x["confidence"] > 70.0:
+                        weighting = self.get_global_weighting(x["type"])
+                        weighting *= (x["confidence"] / 100)
+                        if outcome["intent"] == "exclude":
+                            weighting *= -100
+                        entity = {
+                            "key": x["key"],
+                            "type": x["type"],
+                            "weighting": weighting,
+                            "source": "detection"
+                        }
+                        entities.append(entity)
+        else:
+            # TODO need to decide what to do here
+            pass
 
-    # def create(self, new_context_id, user_id, session_id, detection_result):
-    #     # TODO get global context from DB
-    #
-    #     context = {
-    #         "_id": str(new_context_id)
-    #     }
-    #     if detection_result is None:
-    #         context["entities"] = [
-    #             {
-    #                 "type": "popular",
-    #                 "key": "popular",
-    #                 "weighting": self.get_global_weighting("popular"),
-    #                 "source": "default"
-    #             },
-    #             {
-    #                 "type": "added",
-    #                 "key": "added",
-    #                 "weighting": self.get_global_weighting("added"),
-    #                 "source": "default"
-    #             }
-    #         ]
-    #     elif detection_result is not None:
-    #         entities = []
-    #         for outcome in detection_result["outcomes"]:
-    #             for x in outcome["entities"]:
-    #                 if x["confidence"] > 70.0:
-    #                     weighting = self.get_global_weighting(x["type"])
-    #                     weighting *= (x["confidence"] / 100)
-    #                     if outcome["intent"] == "exclude":
-    #                         weighting *= -100
-    #                     entity = {
-    #                         "key": x["key"],
-    #                         "type": x["type"],
-    #                         "weighting": weighting,
-    #                         "source": "detection"
-    #                     }
-    #                     entities.append(entity)
-    #         # for x in detection_result["detections"]:
-    #         #     entity = {
-    #         #         "key": x["key"],
-    #         #         "type": x["type"],
-    #         #         "weighting": self.get_global_weighting(x["type"]),
-    #         #         "source": "detection"
-    #         #     }
-    #         #     entities.append(entity)
-    #
-    #         context["entities"] = entities
-    #     else:
-    #         raise NotImplemented("")
-    #
-    #     self.cache.update(
-    #         [
-    #             (
-    #                 context["_id"],
-    #                 context
-    #             )
-    #         ]
-    #     )
-    #     return context
-    #
-    #     # TODO get user context
-    #     # TODO get user context
-    #     # TODO get detection context
+        self.context_data.update(context_id, _rev, entities=entities)
+        return entities

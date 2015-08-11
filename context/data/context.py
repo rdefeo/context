@@ -19,8 +19,8 @@ class Context(Base):
             }
         )[0]
 
-    def insert(self, entities, locale:str, new_context_id: ObjectId, application_id: ObjectId, session_id: ObjectId,
-               user_id: ObjectId, now=None):
+    def insert(self, entities: list, locale: str, new_context_id: ObjectId, application_id: ObjectId,
+               session_id: ObjectId, user_id: ObjectId, now=None):
         if now is None:
             now = datetime.now()
 
@@ -32,7 +32,7 @@ class Context(Base):
             "created": now.isoformat(),
             "application_id": application_id,
             "version": __version__,
-            "_ver": new_context_id
+            "_rev": new_context_id
         }
         if user_id is not None:
             record["user_id"] = user_id
@@ -41,25 +41,27 @@ class Context(Base):
 
         return {
             "_id": new_context_id,
-            "_ver": new_context_id
+            "_rev": new_context_id
         }
 
-    def update(self, context_id: ObjectId, _ver: ObjectId, now: datetime=None) -> ObjectId:
+    def update(self, context_id: ObjectId, _ver: ObjectId, entities: list=None, now: datetime=None) -> ObjectId:
 
         now = datetime.now() if now is None else now
+        set_data = {
+            "_rev": _ver,
+            "updated": now.isoformat()
+        }
+        if entities is not None:
+            set_data["entities"] =entities
+
 
         self.collection.update(
             {
                 "_id": context_id
             },
             {
-                "$set": {
-                    "_ver": _ver,
-                    "updated": now.isoformat()
-                }
+                "$set": set_data
             }
         )
 
         return _ver
-
-

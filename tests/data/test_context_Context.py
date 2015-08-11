@@ -29,6 +29,7 @@ class update_tests(TestCase):
         actual = target.update(
             "context_id_value",
             "new_ver_id_value",
+            "entites_value",
             datetime(2000, 1, 1)
         )
 
@@ -47,7 +48,40 @@ class update_tests(TestCase):
         self.assertDictEqual(
             {
                 '$set': {
-                    '_ver': 'new_ver_id_value',
+                    '_rev': 'new_ver_id_value',
+                    'entities': 'entites_value',
+                    'updated': '2000-01-01T00:00:00'
+                }
+            },
+            target.collection.update.call_args_list[0][0][1]
+        )
+
+    def test_entities_none(self):
+        target = Target()
+        target.collection = Mock()
+        actual = target.update(
+            "context_id_value",
+            "new_ver_id_value",
+            entities=None,
+            now=datetime(2000, 1, 1)
+        )
+
+        self.assertEqual(
+            "new_ver_id_value",
+            actual
+        )
+
+        self.assertEqual(1, target.collection.update.call_count)
+        self.assertDictEqual(
+            {
+                '_id': 'context_id_value'
+            },
+            target.collection.update.call_args_list[0][0][0]
+        )
+        self.assertDictEqual(
+            {
+                '$set': {
+                    '_rev': 'new_ver_id_value',
                     'updated': '2000-01-01T00:00:00'
                 }
             },
@@ -69,7 +103,7 @@ class insert_tests(TestCase):
         )
 
         self.assertDictEqual(
-            {'_ver': 'new_context_id_value', '_id': 'new_context_id_value'},
+            {'_rev': 'new_context_id_value', '_id': 'new_context_id_value'},
             actual
         )
 
@@ -83,7 +117,7 @@ class insert_tests(TestCase):
                 'session_id': 'session_id',
                 'application_id': 'application_id_value',
                 'user_id': 'user_id',
-                '_ver': 'new_context_id_value',
+                '_rev': 'new_context_id_value',
                 'version': "0.0.2"
             },
             target.collection.insert.call_args_list[0][0][0]
@@ -103,7 +137,7 @@ class insert_tests(TestCase):
         )
 
         self.assertDictEqual(
-            {'_ver': 'new_context_id_value', '_id': 'new_context_id_value'},
+            {'_rev': 'new_context_id_value', '_id': 'new_context_id_value'},
             actual
         )
 
@@ -116,7 +150,7 @@ class insert_tests(TestCase):
                 'locale': 'locale_value',
                 'session_id': 'session_id',
                 'application_id': 'application_id_value',
-                '_ver': 'new_context_id_value',
+                '_rev': 'new_context_id_value',
                 'version': '0.0.2'
             },
             target.collection.insert.call_args_list[0][0][0]

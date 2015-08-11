@@ -72,19 +72,27 @@ class insert_tests(TestCase):
             target.collection.insert.call_args_list[0][0][0]
         )
 
-        self.assertEqual(
-            ObjectId('992345678901234567890123'),
+        self.assertDictEqual(
+            {
+                '_id': ObjectId('992345678901234567890123'),
+                'context_id': ObjectId('012345678901234567890123'),
+                'created': '2000-01-01T00:00:00',
+                'direction': 1,
+                'text': 'text_value',
+                'updated': '2000-01-01T00:00:00',
+                'version': '0.0.2'
+            },
             actual
         )
 
-    def test_with_detection_id(self):
+    def test_with_detection(self):
         target = Target()
         target.collection = Mock()
         actual = target.insert(
             ObjectId("012345678901234567890123"),
             Direction.IN,
             "text_value",
-            detection_id=ObjectId("A12345678901234567890123"),
+            detection="detection_value",
             now=datetime(2000, 1, 1),
             _id=ObjectId('992345678901234567890123')
         )
@@ -95,7 +103,7 @@ class insert_tests(TestCase):
             {
                 '_id': ObjectId('992345678901234567890123'),
                 'context_id': ObjectId('012345678901234567890123'),
-                'detection_id': ObjectId('a12345678901234567890123'),
+                'detection': "detection_value",
                 'updated': '2000-01-01T00:00:00',
                 'created': '2000-01-01T00:00:00',
                 'text': 'text_value',
@@ -105,8 +113,16 @@ class insert_tests(TestCase):
             target.collection.insert.call_args_list[0][0][0]
         )
 
-        self.assertEqual(
-            ObjectId('992345678901234567890123'),
+        self.assertDictEqual(
+            {
+                '_id': ObjectId('992345678901234567890123'),
+                'context_id': ObjectId('012345678901234567890123'),
+                'created': '2000-01-01T00:00:00',
+                'direction': 1,
+                'detection': 'detection_value',
+                'text': 'text_value',
+                'updated': '2000-01-01T00:00:00',
+                'version': '0.0.2'
+            },
             actual
         )
-

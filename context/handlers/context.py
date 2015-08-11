@@ -9,6 +9,7 @@ from tornado.escape import json_encode, json_decode
 
 class Context(RequestHandler):
     context_data = None
+    contextualizer  = None
 
     def initialize(self, contextualizer):
         self.contextualizer = contextualizer
@@ -35,27 +36,24 @@ class Context(RequestHandler):
     @asynchronous
     def post(self, *args, **kwargs):
         new_context_id = ObjectId()
-        context = self.contextualizer.create(new_context_id, self.param_user_id(), self.param_session_id())
-
-        self.set_header('Content-Type', 'application/json')
-        self.add_header("Location", "/%s" % str(context["_id"]))
-        self.add_header("_id", str(context["_id"]))
-        self.add_header("_ver", str(context["_id"]))
-        self.set_status(202)
-        self.finish()
-
+        entities = self.contextualizer.create(self.param_user_id(), self.param_session_id())
         self.context_data.insert(
-            context["entities"],
+            entities,
             self.param_locale(),
-            context["_id"],
+            new_context_id,
             self.param_application_id(),
             self.param_session_id(),
             self.param_user_id()
         )
-        self.context_data.close_connection()
+        self.set_header('Content-Type', 'application/json')
+        self.add_header("Location", "/%s" % str(new_context_id))
+        self.add_header("_id", str(new_context_id))
+        self.add_header("_rev", str(new_context_id))
+        self.set_status(201)
+        self.finish()
 
     def param_ver(self):
-        return self.get_argument("_ver", None)
+        return self.get_argument("_rev", None)
 
     def param_locale(self):
         locale = self.get_argument("locale", None)

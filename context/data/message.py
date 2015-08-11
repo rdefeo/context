@@ -26,7 +26,8 @@ class Message(Base):
             raise Exception("No parameters")
         return list(self.collection.find(query))
 
-    def insert(self, context_id: ObjectId, direction: Direction, text: str, detection: dict=None, _id: ObjectId=None, now: datetime=None) -> ObjectId:
+    def insert(self, context_id: ObjectId, direction: Direction, text: str, detection: dict=None,
+               _id: ObjectId=None, now: datetime=None) -> dict:
         now = datetime.now() if now is None else now
 
         _id = ObjectId() if _id is None else _id
@@ -45,7 +46,7 @@ class Message(Base):
 
         self.collection.insert(data)
 
-        return _id
+        return data
 
     def update(self, _id: ObjectId, now: datetime=None):
         now = datetime.now() if now is None else now
