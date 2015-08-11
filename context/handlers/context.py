@@ -23,7 +23,7 @@ class Context(RequestHandler):
     def get(self, context_id, *args, **kwargs):
         self.set_status(200)
         self.set_header('Content-Type', 'application/json')
-        
+
         # hours = 600
         # self.set_header('Cache-Control', 'public,max-age=%d' % int(3600*hours))
         self.finish(

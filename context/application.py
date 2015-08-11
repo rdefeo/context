@@ -15,9 +15,9 @@ class Application(tornado.web.Application):
         tornado.web.Application.__init__(
             self,
             [
-                url(r"/(.*)?    ", handlers.ContextHandler, dict(contextualizer=Contextualizer()), name="context"),
-                url(r"/(.*)/messages", handlers.MessagesHandler, name="messages"),
-                url(r"/(.*)/messages/", handlers.MessageHandler, name="message"),
+                url(r"/([0-9a-fA-F]+)?", handlers.ContextHandler, dict(contextualizer=Contextualizer()), name="context"),
+                url(r"/([0-9a-fA-F]+)/messages", handlers.MessagesHandler, name="messages"),
+                url(r"/([0-9a-fA-F]+)/messages/", handlers.MessageHandler, name="message"),
                 url(r"/feedback", handlers.FeedbackHandler, name="feedback"),
                 url(r"/status", handlers.StatusHandler, name="status")
             ],
