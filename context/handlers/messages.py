@@ -38,8 +38,8 @@ class Message(RequestHandler):
 
         self.set_status(201)
         self.set_header("Location", "/%s/messages/%s" % (context_id, message_id))
-        self.set_header("_id", message_id)
-        self.set_header("_ver", _ver)
+        self.set_header("_id", str(message_id))
+        self.set_header("_ver", str(_ver))
         self.finish()
 
     def path_context_id(self, context_id) -> ObjectId:
