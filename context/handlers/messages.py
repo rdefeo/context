@@ -3,7 +3,7 @@ from bson.errors import InvalidId
 from tornado.escape import json_decode, json_encode
 from tornado.gen import engine
 from tornado.web import RequestHandler, asynchronous, Finish
-from bson.json_util import dumps
+from bson.json_util import dumps, loads
 
 from context import data, __version__
 
@@ -31,7 +31,7 @@ class Message(RequestHandler):
             self.path_context_id(context_id),
             self.body_direction(),
             self.body_text(),
-            detection_id=self.param_detection_id()
+            detection=self.body_detection()
         )
 
         _ver = self.context_data.update(self.path_context_id(context_id), message_id)
@@ -59,7 +59,7 @@ class Message(RequestHandler):
 
     def body(self) -> dict:
         try:
-            return json_decode(self.request.body)
+            return loads(self.request.body.decode("utf-8"))
         except:
             self.set_status(412)
             self.finish(
@@ -72,25 +72,9 @@ class Message(RequestHandler):
             )
             raise Finish()
 
-    def param_detection_id(self):
-        raw_detection_id = self.get_argument("detection_id", None)
-        try:
-            return ObjectId(raw_detection_id) if raw_detection_id is not None else None
-        except InvalidId:
-            self.set_status(412)
-            self.finish(
-                json_encode(
-                    {
-                        "status": "error",
-                        "message": "invalid param=detection_id,detection_id=%s" % raw_detection_id
-                    }
-                )
-            )
-            return
-
     def body_direction(self) -> data.MessageDirection:
+        raw_direction = self.body()["direction"] if "direction" in self.body() else None
         try:
-            raw_direction = self.body()["direction"] if "direction" in self.body() else None
             return data.MessageDirection(int(raw_direction))
         except:
             self.set_status(412)
@@ -103,6 +87,9 @@ class Message(RequestHandler):
                 )
             )
             raise Finish()
+
+    def body_detection(self) -> dict:
+        return self.body()["detection"] if "detection" in self.body() else None
 
     def body_text(self) -> str:
         if "text" in self.body():
