@@ -86,7 +86,7 @@ class Context(RequestHandler):
     def param_locale(self):
         locale = self.get_argument("locale", None)
         if locale is None:
-            self.set_status(412)
+            self.set_status(428)
             self.finish(
                 json_encode(
                     {
@@ -102,7 +102,7 @@ class Context(RequestHandler):
     def param_application_id(self):
         raw_application_id = self.get_argument("application_id", None)
         if raw_application_id is None:
-            self.set_status(412)
+            self.set_status(428)
             self.finish(
                 json_encode(
                     {
@@ -130,7 +130,7 @@ class Context(RequestHandler):
     def param_session_id(self):
         raw_session_id = self.get_argument("session_id", None)
         if not raw_session_id:
-            self.set_status(412)
+            self.set_status(428)
             self.finish(
                 json_encode({
                     "status": "error",

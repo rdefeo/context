@@ -37,7 +37,7 @@ class Message(RequestHandler):
     def path_context_id(self, context_id) -> ObjectId:
         try:
             return ObjectId(context_id)
-        except:
+        except InvalidId:
             self.set_status(412)
             self.finish(
                 json_encode(
@@ -68,7 +68,7 @@ class Message(RequestHandler):
         raw_detection_id = self.get_argument("detection_id", None)
         try:
             return ObjectId(raw_detection_id) if raw_detection_id is not None else None
-        except:
+        except InvalidId:
             self.set_status(412)
             self.finish(
                 json_encode(
