@@ -21,7 +21,7 @@ class Context(Base):
     LOGGER = logging.getLogger(__name__)
     collection_name = "context"
 
-    def get(self, _id):
+    def get(self, _id, _ver):
         return self.collection.find(
             {
                 "_id": _id

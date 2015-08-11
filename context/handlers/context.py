@@ -1,6 +1,6 @@
 from bson import ObjectId
 from bson.errors import InvalidId
-import tornado
+from bson.json_util import dumps
 
 __author__ = 'robdefeo'
 from tornado.web import RequestHandler, asynchronous, Finish
@@ -20,13 +20,16 @@ class Context(RequestHandler):
         pass
 
     @asynchronous
-    def get(self, *args, **kwargs):
-        context_id = self.get_argument("context_id", None)
+    def get(self, context_id, *args, **kwargs):
         self.set_status(200)
+        self.set_header('Content-Type', 'application/json')
+        
         # hours = 600
         # self.set_header('Cache-Control', 'public,max-age=%d' % int(3600*hours))
         self.finish(
-            self.contextualizer.cache[context_id]
+            dumps(
+                self.context_data.get(self.path_context_id(context_id), self.param_ver())
+            )
         )
 
     @asynchronous
@@ -50,6 +53,9 @@ class Context(RequestHandler):
             self.param_user_id()
         )
         self.context_data.close_connection()
+
+    def param_ver(self):
+        return self.get_argument("_ver", None)
 
     def param_locale(self):
         locale = self.get_argument("locale", None)
@@ -153,3 +159,17 @@ class Context(RequestHandler):
             )
             raise Finish()
 
+    def path_context_id(self, context_id) -> ObjectId:
+        try:
+            return ObjectId(context_id)
+        except:
+            self.set_status(412)
+            self.finish(
+                json_encode(
+                    {
+                        "status": "error",
+                        "message": "invalid param=context_id,context_id=%s" % context_id
+                    }
+                )
+            )
+            raise Finish()
