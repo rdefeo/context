@@ -38,14 +38,10 @@ class Contextualizer(object):
         context["detection_id"] = str(context["detection_id"]) if "detection_id" in context else None
         return context
 
-    def create(self, new_context_id, user_id, session_id, detection_result):
-        # TODO get global context from DB
-
+    def create(self, new_context_id: ObjectId, user_id: ObjectId, session_id: ObjectId):
         context = {
-            "_id": str(new_context_id)
-        }
-        if detection_result is None:
-            context["entities"] = [
+            "_id": new_context_id,
+            "entities": [
                 {
                     "type": "popular",
                     "key": "popular",
@@ -59,46 +55,70 @@ class Contextualizer(object):
                     "source": "default"
                 }
             ]
-        elif detection_result is not None:
-            entities = []
-            for outcome in detection_result["outcomes"]:
-                for x in outcome["entities"]:
-                    if x["confidence"] > 70.0:
-                        weighting = self.get_global_weighting(x["type"])
-                        weighting *= (x["confidence"] / 100)
-                        if outcome["intent"] == "exclude":
-                            weighting *= -100
-                        entity = {
-                            "key": x["key"],
-                            "type": x["type"],
-                            "weighting": weighting,
-                            "source": "detection"
-                        }
-                        entities.append(entity)
-            # for x in detection_result["detections"]:
-            #     entity = {
-            #         "key": x["key"],
-            #         "type": x["type"],
-            #         "weighting": self.get_global_weighting(x["type"]),
-            #         "source": "detection"
-            #     }
-            #     entities.append(entity)
+        }
 
-            context["entities"] = entities
-        else:
-            raise NotImplemented("")
-
-        self.cache.update(
-            [
-                (
-                    context["_id"],
-                    context
-                )
-            ]
-        )
         return context
 
-        # TODO get user context
-        # TODO get user context
-        # TODO get detection context
-
+    # def create(self, new_context_id, user_id, session_id, detection_result):
+    #     # TODO get global context from DB
+    #
+    #     context = {
+    #         "_id": str(new_context_id)
+    #     }
+    #     if detection_result is None:
+    #         context["entities"] = [
+    #             {
+    #                 "type": "popular",
+    #                 "key": "popular",
+    #                 "weighting": self.get_global_weighting("popular"),
+    #                 "source": "default"
+    #             },
+    #             {
+    #                 "type": "added",
+    #                 "key": "added",
+    #                 "weighting": self.get_global_weighting("added"),
+    #                 "source": "default"
+    #             }
+    #         ]
+    #     elif detection_result is not None:
+    #         entities = []
+    #         for outcome in detection_result["outcomes"]:
+    #             for x in outcome["entities"]:
+    #                 if x["confidence"] > 70.0:
+    #                     weighting = self.get_global_weighting(x["type"])
+    #                     weighting *= (x["confidence"] / 100)
+    #                     if outcome["intent"] == "exclude":
+    #                         weighting *= -100
+    #                     entity = {
+    #                         "key": x["key"],
+    #                         "type": x["type"],
+    #                         "weighting": weighting,
+    #                         "source": "detection"
+    #                     }
+    #                     entities.append(entity)
+    #         # for x in detection_result["detections"]:
+    #         #     entity = {
+    #         #         "key": x["key"],
+    #         #         "type": x["type"],
+    #         #         "weighting": self.get_global_weighting(x["type"]),
+    #         #         "source": "detection"
+    #         #     }
+    #         #     entities.append(entity)
+    #
+    #         context["entities"] = entities
+    #     else:
+    #         raise NotImplemented("")
+    #
+    #     self.cache.update(
+    #         [
+    #             (
+    #                 context["_id"],
+    #                 context
+    #             )
+    #         ]
+    #     )
+    #     return context
+    #
+    #     # TODO get user context
+    #     # TODO get user context
+    #     # TODO get detection context

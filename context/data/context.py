@@ -29,7 +29,7 @@ class Context(Base):
         )[0]
 
     def insert(self, entities, locale:str, new_context_id: ObjectId, application_id: ObjectId, session_id: ObjectId,
-               user_id: ObjectId, detection_id: ObjectId, now=None):
+               user_id: ObjectId, now=None):
         if now is None:
             now = datetime.now()
 
@@ -45,8 +45,6 @@ class Context(Base):
         }
         if user_id is not None:
             record["user_id"] = user_id
-        if detection_id is not None:
-            record["detection_id"] = detection_id
 
         self.collection.insert(record)
 

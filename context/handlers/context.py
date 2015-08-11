@@ -8,8 +8,13 @@ from tornado.escape import json_encode, json_decode
 
 
 class Context(RequestHandler):
+    context_data = None
+
     def initialize(self, contextualizer):
         self.contextualizer = contextualizer
+        from context.data.context import Context
+        self.context_data = Context()
+        self.context_data.open_connection()
 
     def on_finish(self):
         pass
@@ -26,62 +31,25 @@ class Context(RequestHandler):
 
     @asynchronous
     def post(self, *args, **kwargs):
-        self.set_header('Content-Type', 'application/json')
-        # user_id = self.get_argument("user_id", None)
-        # session_id = self.get_argument("session_id", None)
-        # application_id = self.get_argument("application_id", None)
-        # locale = self.get_argument("locale", None)
-        # body = tornado.escape.json_decode(self.request.body)
-
-        detection_response = None
-        if "detection_response" in self.body():
-            detection_response = self.body()["detection_response"]
-
         new_context_id = ObjectId()
-        context = self.contextualizer.create(
-            new_context_id,
-            self.param_user_id(),
-            self.param_session_id(),
-            detection_response
+        context = self.contextualizer.create(new_context_id, self.param_user_id(), self.param_session_id())
 
-        )
-
-        self.add_header(
-            "Location",
-            "http://%s/%s" % (self.request.host, str(context["_id"]))
-        )
-        try:
-            db_detection_id = ObjectId(detection_response["_id"]) if detection_response is not None else None
-        except InvalidId:
-            self.set_status(412)
-            self.finish(
-                json_encode(
-                    {
-                        "status": "error",
-                        "message": "invalid param=detection_response_id,user_id=%s" % detection_response["_id"]
-                    }
-                )
-            )
-            raise Finish()
-
+        self.set_header('Content-Type', 'application/json')
+        self.add_header("Location", "/%s" % str(context["_id"]))
+        self.add_header("_id", str(context["_id"]))
+        self.add_header("_ver", str(context["_id"]))
         self.set_status(202)
-        self.finish(context)
+        self.finish()
 
-        from context.data.context import Context
-        context_data = Context()
-        context_data.open_connection()
-        context_data.insert(
+        self.context_data.insert(
             context["entities"],
             self.param_locale(),
-            ObjectId(context["_id"]),
+            context["_id"],
             self.param_application_id(),
             self.param_session_id(),
-            self.param_user_id(),
-            db_detection_id
+            self.param_user_id()
         )
-        context_data.close_connection()
-
-
+        self.context_data.close_connection()
 
     def param_locale(self):
         locale = self.get_argument("locale", None)
