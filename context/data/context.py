@@ -28,7 +28,8 @@ class Context(Base):
             }
         )[0]
 
-    def insert(self, entities, locale, new_context_id, application_id, session_id, user_id, detection_id, now=None):
+    def insert(self, entities, locale:str, new_context_id: ObjectId, application_id: ObjectId, session_id: ObjectId,
+               user_id: ObjectId, detection_id: ObjectId, now=None):
         if now is None:
             now = datetime.now()
 

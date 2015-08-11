@@ -1,9 +1,10 @@
 from bson import ObjectId
+from bson.errors import InvalidId
 import tornado
 
 __author__ = 'robdefeo'
-from tornado.web import RequestHandler, asynchronous
-from tornado.escape import json_encode
+from tornado.web import RequestHandler, asynchronous, Finish
+from tornado.escape import json_encode, json_decode
 
 
 class Context(RequestHandler):
@@ -26,55 +27,21 @@ class Context(RequestHandler):
     @asynchronous
     def post(self, *args, **kwargs):
         self.set_header('Content-Type', 'application/json')
-        user_id = self.get_argument("user_id", None)
-        session_id = self.get_argument("session_id", None)
-        application_id = self.get_argument("application_id", None)
-        locale = self.get_argument("locale", None)
-        body = tornado.escape.json_decode(self.request.body)
-
-        if application_id is None:
-            self.set_status(412)
-            self.finish(
-                json_encode(
-                    {
-                        "status": "error",
-                        "message": "missing param=application_id"
-                    }
-                )
-            )
-            return None
-        elif session_id is None:
-            self.set_status(412)
-            self.finish(
-                json_encode(
-                    {
-                        "status": "error",
-                        "message": "missing param=session_id"
-                    }
-                )
-            )
-            return None
-        elif locale is None:
-            self.set_status(412)
-            self.finish(
-                json_encode(
-                    {
-                        "status": "error",
-                        "message": "missing param=locale"
-                    }
-                )
-            )
-            return None
+        # user_id = self.get_argument("user_id", None)
+        # session_id = self.get_argument("session_id", None)
+        # application_id = self.get_argument("application_id", None)
+        # locale = self.get_argument("locale", None)
+        # body = tornado.escape.json_decode(self.request.body)
 
         detection_response = None
-        if "detection_response" in body:
-            detection_response = body["detection_response"]
+        if "detection_response" in self.body():
+            detection_response = self.body()["detection_response"]
 
         new_context_id = ObjectId()
         context = self.contextualizer.create(
             new_context_id,
-            user_id,
-            session_id,
+            self.param_user_id(),
+            self.param_session_id(),
             detection_response
 
         )
@@ -84,50 +51,8 @@ class Context(RequestHandler):
             "http://%s/%s" % (self.request.host, str(context["_id"]))
         )
         try:
-            db_application_id = ObjectId(application_id)
-        except:
-            self.set_status(412)
-            self.finish(
-                json_encode(
-                    {
-                        "status": "error",
-                        "message": "invalid param=application_id,application_id=%s" % application_id
-                    }
-                )
-            )
-            return
-
-        try:
-            db_session_id = ObjectId(session_id)
-        except:
-            self.set_status(412)
-            self.finish(
-                json_encode(
-                    {
-                        "status": "error",
-                        "message": "invalid param=session_id,session_id=%s" % session_id
-                    }
-                )
-            )
-            return
-
-        try:
-            db_user_id = ObjectId(user_id) if user_id is not None else None
-        except:
-            self.set_status(412)
-            self.finish(
-                json_encode(
-                    {
-                        "status": "error",
-                        "message": "invalid param=user_id,user_id=%s" % user_id
-                    }
-                )
-            )
-            return
-
-        try:
             db_detection_id = ObjectId(detection_response["_id"]) if detection_response is not None else None
-        except:
+        except InvalidId:
             self.set_status(412)
             self.finish(
                 json_encode(
@@ -137,22 +62,126 @@ class Context(RequestHandler):
                     }
                 )
             )
-            return
+            raise Finish()
 
-        if self.get_argument("skip_mongodb_log", None) is None:
-            from context.data.context import Context
-            context_data = Context()
-            context_data.open_connection()
-            context_data.insert(
-                context["entities"],
-                locale,
-                ObjectId(context["_id"]),
-                db_application_id,
-                db_session_id,
-                db_user_id,
-                db_detection_id
-            )
-            context_data.close_connection()
-
-        self.set_status(201)
+        self.set_status(202)
         self.finish(context)
+
+        from context.data.context import Context
+        context_data = Context()
+        context_data.open_connection()
+        context_data.insert(
+            context["entities"],
+            self.param_locale(),
+            ObjectId(context["_id"]),
+            self.param_application_id(),
+            self.param_session_id(),
+            self.param_user_id(),
+            db_detection_id
+        )
+        context_data.close_connection()
+
+
+
+    def param_locale(self):
+        locale = self.get_argument("locale", None)
+        if locale is None:
+            self.set_status(412)
+            self.finish(
+                json_encode(
+                    {
+                        "status": "error",
+                        "message": "missing param=locale"
+                    }
+                )
+            )
+            raise Finish()
+        else:
+            return locale
+
+    def param_application_id(self):
+        raw_application_id = self.get_argument("application_id", None)
+        if raw_application_id is None:
+            self.set_status(412)
+            self.finish(
+                json_encode(
+                    {
+                        "status": "error",
+                        "message": "missing param(s) application_id"
+                    }
+                )
+            )
+            raise Finish()
+
+        try:
+            return ObjectId(raw_application_id)
+        except InvalidId:
+            self.set_status(412)
+            self.finish(
+                json_encode(
+                    {
+                        "status": "error",
+                        "message": "invalid param=application_id,application_id=%s" % raw_application_id
+                    }
+                )
+            )
+            raise Finish()
+
+    def param_session_id(self):
+        raw_session_id = self.get_argument("session_id", None)
+        if not raw_session_id:
+            self.set_status(412)
+            self.finish(
+                json_encode({
+                    "status": "error",
+                    "message": "missing param(s) session_id"
+                }
+                )
+            )
+            raise Finish()
+
+        try:
+            return ObjectId(raw_session_id)
+        except InvalidId:
+            self.set_status(412)
+            self.finish(
+                json_encode(
+                    {
+                        "status": "error",
+                        "message": "invalid param=session_id,session_id=%s" % raw_session_id
+                    }
+                )
+            )
+            raise Finish()
+
+    def param_user_id(self):
+        raw_user_id = self.get_argument("user_id", None)
+        try:
+            return ObjectId(raw_user_id) if raw_user_id is not None else None
+        except InvalidId:
+            self.set_status(412)
+            self.finish(
+                json_encode(
+                    {
+                        "status": "error",
+                        "message": "invalid param=user_id,user_id=%s" % raw_user_id
+                    }
+                )
+            )
+            raise Finish()
+
+    def body(self) -> dict:
+        try:
+            return json_decode(self.request.body)
+        except:
+            self.set_status(412)
+            self.finish(
+                json_encode(
+                    {
+                        "status": "error",
+                        "message": "invalid body,body=%s" % self.request.body
+                    }
+                )
+            )
+            raise Finish()
+
