@@ -10,6 +10,7 @@ from context import data, __version__
 
 class Message(RequestHandler):
     context_data = None
+    message_data = None
 
     def data_received(self, chunk):
         pass
@@ -17,6 +18,8 @@ class Message(RequestHandler):
     def initialize(self):
         self.context_data = data.ContextData()
         self.context_data.open_connection()
+        self.message_data = data.MessageData()
+        self.message_data.open_connection()
 
     def on_finish(self):
         pass
@@ -24,14 +27,19 @@ class Message(RequestHandler):
     @asynchronous
     @engine
     def post(self, context_id, *args, **kwargs):
-        message_id = self.context_data.insert_message(
+        message_id = self.message_data.insert(
             self.path_context_id(context_id),
             self.body_direction(),
             self.body_text(),
             detection_id=self.param_detection_id()
         )
+
+        _ver = self.context_data.update(self.path_context_id(context_id), message_id)
+
         self.set_status(201)
         self.set_header("Location", "/%s/messages/%s" % (context_id, message_id))
+        self.set_header("_id", message_id)
+        self.set_header("_ver", _ver)
         self.finish()
 
     def path_context_id(self, context_id) -> ObjectId:
@@ -113,14 +121,14 @@ class Message(RequestHandler):
 
 
 class Messages(RequestHandler):
-    context_data = None
+    message_data = None
 
     def data_received(self, chunk):
         pass
 
     def initialize(self):
-        self.context_data = data.ContextData()
-        self.context_data.open_connection()
+        self.message_data = data.MessageData()
+        self.message_data.open_connection()
 
     def on_finish(self):
         pass
@@ -129,7 +137,7 @@ class Messages(RequestHandler):
     @engine
     def get(self, context_id, *args, **kwargs):
 
-        db_messages = self.context_data.find_messages(context_id=self.path_context_id(context_id))
+        db_messages = self.message_data.find(context_id=self.path_context_id(context_id))
 
         self.set_status(200)
         self.set_header("Content-Type", "application/json")
