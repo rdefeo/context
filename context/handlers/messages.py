@@ -98,7 +98,7 @@ class Message(RequestHandler):
 
     def body_text(self) -> str:
         if "text" in self.body():
-            return self.body()["body"]
+            return self.body()["text"]
         else:
             self.set_status(412)
             self.finish(
