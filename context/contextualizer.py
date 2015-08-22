@@ -56,11 +56,11 @@ class Contextualizer(object):
         ]
 
     def update(self, context_id: ObjectId, _rev:ObjectId, messages:list):
-        in_messages = (x for x in messages if x["direction"] == MessageDirection.IN)
+        in_messages = (x for x in messages if x["direction"] == MessageDirection.IN.value)
         last_in_message = next(in_messages, None)
         entities = []
         if last_in_message is not None:
-            for outcome in last_in_message["outcomes"]:
+            for outcome in last_in_message["detection"]["outcomes"]:
                 for x in outcome["entities"]:
                     if x["confidence"] > 70.0:
                         weighting = self.get_global_weighting(x["type"])

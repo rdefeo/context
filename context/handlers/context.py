@@ -38,7 +38,7 @@ class Context(RequestHandler):
         # self.set_header('Cache-Control', 'public,max-age=%d' % int(3600*hours))
         self.finish(
             dumps(
-                self.context_data.get(self.path_extractor.context_id(context_id), self.param_extractor.ver())
+                self.context_data.get(self.path_extractor.context_id(context_id), self.param_extractor.rev())
             )
         )
 

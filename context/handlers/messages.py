@@ -49,13 +49,13 @@ class Message(RequestHandler):
         # TODO get messages
 
         # TODO calculate new context
-        _ver = message["_id"]
-        self.contextualizer.update(self.path_extractor.context_id(context_id), _ver, [message])
+        _rev = message["_id"]
+        self.contextualizer.update(self.path_extractor.context_id(context_id), _rev, [message])
 
         self.set_status(201)
         self.set_header("Location", "/%s/messages/%s" % (context_id, message["_id"]))
         self.set_header("_id", str(message["_id"]))
-        self.set_header("_rev", str(_ver))
+        self.set_header("_rev", str(_rev))
         self.finish()
 
 

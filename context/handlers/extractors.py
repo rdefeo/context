@@ -1,5 +1,6 @@
 from bson import ObjectId
 from bson.errors import InvalidId
+from bson.json_util import loads
 from tornado.escape import json_encode, json_decode
 from tornado.web import RequestHandler, Finish
 from context.data import MessageDirection
@@ -31,7 +32,7 @@ class BodyExtractor:
 
     def body(self) -> dict:
         try:
-            return json_decode(self.handler.request.body)
+            return loads(self.handler.request.body.decode("utf-8"))
         except:
             self.handler.set_status(412)
             self.handler.finish(
@@ -53,7 +54,7 @@ class BodyExtractor:
                 json_encode(
                     {
                         "status": "error",
-                        "message": "body [mete_data] direction,direction=%s"
+                        "message": "body [mete_data] direction"
                     }
                 )
             )
@@ -226,7 +227,7 @@ class ParamExtractor:
             )
             raise Finish()
 
-    def ver(self):
+    def rev(self):
         return self.handler.get_argument("_rev", None)
 
     def locale(self):
