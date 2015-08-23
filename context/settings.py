@@ -16,6 +16,8 @@ MONGODB_DB = get_env_setting("CONTEXT_MONGODB_DB", "context")
 MONGODB_USER = get_env_setting("CONTEXT_MONGODB_USER", "context")
 MONGODB_PASSWORD = get_env_setting("CONTEXT_MONGODB_PASSWORD", "jemboo")
 
+DATA_CACHE_SIZE_CONTEXT = 2048
+
 PORT = int(get_env_setting("CONTEXT_PORT", 17999))
 
 CONTEXT_CACHE_SIZE = int(get_env_setting("CONTEXT_CONTEXT_CACHE_SIZE", 2048))

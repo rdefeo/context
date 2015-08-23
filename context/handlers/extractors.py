@@ -228,7 +228,20 @@ class ParamExtractor:
             raise Finish()
 
     def rev(self):
-        return self.handler.get_argument("_rev", None)
+        raw_rev = self.handler.get_argument("_rev", None)
+        try:
+            return ObjectId(raw_rev) if raw_rev is not None else None
+        except InvalidId:
+            self.handler.set_status(428)
+            self.handler.finish(
+                json_encode(
+                    {
+                        "status": "error",
+                        "message": "invalid param=_rev,_rev=%s" % raw_rev
+                    }
+                )
+            )
+            raise Finish()
 
     def locale(self):
         locale = self.handler.get_argument("locale", None)

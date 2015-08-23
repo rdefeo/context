@@ -3,21 +3,25 @@ from datetime import datetime
 import logging
 
 from bson import ObjectId
+from pylru import lrucache
 
 from context import __version__
 from context.data.base import Base
+from context.settings import DATA_CACHE_SIZE_CONTEXT
 
 
 class Context(Base):
     LOGGER = logging.getLogger(__name__)
     collection_name = "context"
+    cache = lrucache(DATA_CACHE_SIZE_CONTEXT)
 
     def get(self, _id, _rev):
-        return self.collection.find(
-            {
-                "_id": _id
-            }
-        )[0]
+        if _id in self.cache and self.cache[_id]["_rev"] == _rev:
+            return self.cache[_id]
+        else:
+            data = next(self.collection.find({"_id": _id}), None)
+            self.cache[_id] = data
+            return data
 
     def insert(self, entities: list, locale: str, new_context_id: ObjectId, application_id: ObjectId,
                session_id: ObjectId, user_id: ObjectId, now=None):
@@ -38,22 +42,22 @@ class Context(Base):
             record["user_id"] = user_id
 
         self.collection.insert(record)
+        self.cache[new_context_id] = record
 
         return {
             "_id": new_context_id,
             "_rev": new_context_id
         }
 
-    def update(self, context_id: ObjectId, _ver: ObjectId, entities: list=None, now: datetime=None) -> ObjectId:
+    def update(self, context_id: ObjectId, _rev: ObjectId, entities: list=None, now: datetime=None) -> ObjectId:
 
         now = datetime.now() if now is None else now
         set_data = {
-            "_rev": _ver,
+            "_rev": _rev,
             "updated": now.isoformat()
         }
         if entities is not None:
-            set_data["entities"] =entities
-
+            set_data["entities"] = entities
 
         self.collection.update(
             {
@@ -64,4 +68,9 @@ class Context(Base):
             }
         )
 
-        return _ver
+        if context_id in self.cache:
+            self.cache[context_id]["entities"] = entities
+            self.cache[context_id]["_rev"] = _rev
+            self.cache[context_id]["updated"] = now.isoformat()
+
+        return _rev
