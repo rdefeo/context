@@ -1,15 +1,11 @@
-from context.settings import CONTEXT_CACHE_SIZE
 from bson.objectid import ObjectId
-from cachetools import LRUCache
-from context.data.context import Context
 from context.data import MessageDirection, ContextData
 
 
 class Contextualizer(object):
-    def __init__(self, cache_maxsize=CONTEXT_CACHE_SIZE):
+    def __init__(self):
         self.context_data = ContextData()
         self.context_data.open_connection()
-        self.cache = LRUCache(maxsize=cache_maxsize, missing=self.get_from_db)
         self._global_weightings = {
             "brand": 100.0,
             "color": 90.0,
@@ -27,17 +23,6 @@ class Contextualizer(object):
             return self._global_weightings[_type]
         else:
             return 30.0
-
-    def get_from_db(self, context_id):
-        db = Context()
-        db.open_connection()
-        context = db.get(ObjectId(context_id))
-        db.close_connection()
-        context["_id"] = str(context["_id"])
-        context["session_id"] = str(context["session_id"])
-        context["application_id"] = str(context["application_id"])
-        context["detection_id"] = str(context["detection_id"]) if "detection_id" in context else None
-        return context
 
     def create(self, user_id: ObjectId, session_id: ObjectId):
         return [
