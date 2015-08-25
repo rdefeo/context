@@ -1,32 +1,29 @@
 from __future__ import absolute_import
-from datetime import datetime
 import logging
+from bson import ObjectId
 from bson.code import Code
 from bson.son import SON
-from datetime import datetime
 from datetime import datetime, timedelta
-from pkg_resources import VERSION
-import context
+from context import __version__
 from context.data.base import Base
-
-__author__ = 'robdefeo'
 
 
 class Feedback(Base):
     LOGGER = logging.getLogger(__name__)
     collection_name = "feedback"
 
-    def insert(self, user_id, application_id, session_id, context_id, product_id, _type, meta_data, now=None):
-        if now is None:
-            now = datetime.now()
+    def insert(self, user_id: ObjectId, application_id: ObjectId, session_id: ObjectId, context_id: ObjectId, product_id: ObjectId, _type, meta_data,_id: ObjectId=None, now=None):
+        _id = ObjectId() if _id is None else _id
+        now = datetime.now() if now is None else now
 
         record = {
+            "_id": _id,
             "created": now.isoformat(),
             "application_id": application_id,
             "session_id": session_id,
             "product_id": product_id,
             "type": _type,
-            "version": context.__version__
+            "version": __version__
         }
         if context_id is not None:
             record["context_id"] = context_id
@@ -36,6 +33,8 @@ class Feedback(Base):
             record["meta_data"] = meta_data
 
         self.collection.insert(record)
+
+        return record
 
     def map_product_feedback(self, now=datetime.now(), days_behind=30):
         mapper = Code("""

@@ -18,7 +18,7 @@ class Application(tornado.web.Application):
                 url(r"/([0-9a-fA-F]+)?", handlers.ContextHandler, dict(contextualizer=Contextualizer()), name="context"),
                 url(r"/([0-9a-fA-F]+)/messages", handlers.MessagesHandler, name="messages"),
                 url(r"/([0-9a-fA-F]+)/messages/", handlers.MessageHandler, name="message"),
-                url(r"/feedback", handlers.FeedbackHandler, name="feedback"),
+                url(r"/([0-9a-fA-F]+)/feedback", handlers.FeedbackHandler, name="feedback"),
                 url(r"/status", handlers.StatusHandler, name="status")
             ],
             **settings
