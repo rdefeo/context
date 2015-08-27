@@ -17,6 +17,7 @@ class insert_tests(TestCase):
             "product_id",
             "action_type",
             "meta_data_value",
+            '_id_value',
             datetime(2000, 1, 1)
         )
 
@@ -27,6 +28,7 @@ class insert_tests(TestCase):
         self.assertDictEqual(
             target.collection.insert.call_args_list[0][0][0],
             {
+                '_id': '_id_value',
                 'created': '2000-01-01T00:00:00',
                 'type': 'action_type',
                 'context_id': 'context_id',
@@ -50,6 +52,7 @@ class insert_tests(TestCase):
             "product_id",
             "action_type",
             "meta_data_value",
+            '_id_value',
             datetime(2000, 1, 1)
         )
 
@@ -60,6 +63,7 @@ class insert_tests(TestCase):
         self.assertDictEqual(
             target.collection.insert.call_args_list[0][0][0],
             {
+                '_id': '_id_value',
                 'created': '2000-01-01T00:00:00',
                 'type': 'action_type',
                 'context_id': 'context_id',
@@ -82,6 +86,7 @@ class insert_tests(TestCase):
             "product_id",
             "action_type",
             None,
+            '_id_value',
             datetime(2000, 1, 1)
         )
 
@@ -92,6 +97,7 @@ class insert_tests(TestCase):
         self.assertDictEqual(
             target.collection.insert.call_args_list[0][0][0],
             {
+                '_id': '_id_value',
                 'created': '2000-01-01T00:00:00',
                 'type': 'action_type',
                 'context_id': 'context_id',
@@ -114,7 +120,8 @@ class insert_tests(TestCase):
             "product_id",
             "action_type",
             "meta_data_value",
-            datetime(2000, 1, 1)
+            _id="_id_value",
+            now=datetime(2000, 1, 1)
         )
 
         self.assertEqual(
@@ -122,8 +129,8 @@ class insert_tests(TestCase):
             1
         )
         self.assertDictEqual(
-            target.collection.insert.call_args_list[0][0][0],
             {
+                '_id': '_id_value',
                 'created': '2000-01-01T00:00:00',
                 'type': 'action_type',
                 'product_id': 'product_id',
@@ -132,5 +139,6 @@ class insert_tests(TestCase):
                 'user_id': 'user_id',
                 'version': '0.0.2',
                 'meta_data': 'meta_data_value'
-            }
+            },
+            target.collection.insert.call_args_list[0][0][0]
         )

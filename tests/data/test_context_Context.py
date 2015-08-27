@@ -11,7 +11,7 @@ class get_tests(TestCase):
     def test_regular(self):
         target = Target()
         target.collection = Mock()
-        target.collection.find.return_value = ["first", "second"]
+        target.collection.find.return_value = ["first", "second"].__iter__()
         actual = target.get("_id_value", "_ver_value")
 
         self.assertEqual("first", actual)
