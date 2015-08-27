@@ -10,8 +10,8 @@ from context.data.base import Base
 
 @unique
 class Direction(Enum):
-    IN = 1
-    OUT = 0
+    IN = 1  # user
+    OUT = 0  # jemboo
 
 
 class Message(Base):

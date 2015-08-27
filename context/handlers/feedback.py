@@ -9,14 +9,20 @@ from context import data, __version__
 
 
 class Feedback(RequestHandler):
-    param_extractor = None
-    path_extractor = None
-    body_extractor = None
+    context_data = None
+    feedback_data = None
+
+    _param_extractor = None
+    _path_extractor = None
+    _body_extractor = None
+
+    def data_received(self, chunk):
+        pass
 
     def initialize(self):
-        self.param_extractor = ParamExtractor(self)
-        self.path_extractor = PathExtractor(self)
-        self.body_extractor = BodyExtractor(self)
+        self._param_extractor = ParamExtractor(self)
+        self._path_extractor = PathExtractor(self)
+        self._body_extractor = BodyExtractor(self)
 
         self.context_data = data.ContextData()
         self.context_data.open_connection()
@@ -32,13 +38,13 @@ class Feedback(RequestHandler):
         self.set_header('Content-Type', 'application/json')
 
         inserted_feedback = self.feedback_data.insert(
-            self.param_extractor.user_id(),
-            self.param_extractor.application_id(),
-            self.param_extractor.session_id(),
-            self.path_extractor.context_id(context_id),
-            self.param_extractor.product_id(),
-            self.param_extractor.type(),
-            self.body_extractor.meta_data()
+            self._param_extractor.user_id(),
+            self._param_extractor.application_id(),
+            self._param_extractor.session_id(),
+            self._path_extractor.context_id(context_id),
+            self._param_extractor.product_id(),
+            self._param_extractor.type(),
+            self._body_extractor.meta_data()
         )
 
         _rev = inserted_feedback["_id"]

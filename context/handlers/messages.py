@@ -11,17 +11,17 @@ class Message(RequestHandler):
     context_data = None
     message_data = None
     contextualizer = None
-    param_extractor = None
-    path_extractor = None
-    body_extractor = None
+    _param_extractor = None
+    _path_extractor = None
+    _body_extractor = None
 
     def data_received(self, chunk):
         pass
 
     def initialize(self):
-        self.param_extractor = ParamExtractor(self)
-        self.path_extractor = PathExtractor(self)
-        self.body_extractor = BodyExtractor(self)
+        self._param_extractor = ParamExtractor(self)
+        self._path_extractor = PathExtractor(self)
+        self._body_extractor = BodyExtractor(self)
 
         from context.contextualizer import Contextualizer
         self.contextualizer = Contextualizer()
@@ -38,10 +38,10 @@ class Message(RequestHandler):
     def post(self, context_id, *args, **kwargs):
         # TODO get existing context here
         message = self.message_data.insert(
-            self.path_extractor.context_id(context_id),
-            self.body_extractor.direction(),
-            self.body_extractor.text(),
-            detection=self.body_extractor.detection()
+            self._path_extractor.context_id(context_id),
+            self._body_extractor.direction(),
+            self._body_extractor.text(),
+            detection=self._body_extractor.detection()
         )
 
         # TODO expect ver to more efficiently get messages
@@ -50,7 +50,7 @@ class Message(RequestHandler):
 
         # TODO calculate new context
         _rev = message["_id"]
-        self.contextualizer.update(self.path_extractor.context_id(context_id), _rev, [message])
+        self.contextualizer.update(self._path_extractor.context_id(context_id), _rev, [message])
 
         self.set_status(201)
         self.set_header("Location", "/%s/messages/%s" % (context_id, message["_id"]))
