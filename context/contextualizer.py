@@ -1,4 +1,5 @@
 from bson.objectid import ObjectId
+
 from context.data import MessageDirection, ContextData
 
 
@@ -24,8 +25,9 @@ class Contextualizer(object):
         else:
             return 30.0
 
-    def create(self, user_id: ObjectId, session_id: ObjectId):
-        return [
+    def create(self, context_id: ObjectId, user_id: ObjectId, application_id: ObjectId, session_id: ObjectId,
+               locale: str) -> dict:
+        entities = [
             {
                 "type": "popular",
                 "key": "popular",
@@ -40,7 +42,16 @@ class Contextualizer(object):
             }
         ]
 
-    def update(self, context_id: ObjectId, _rev:ObjectId, messages:list):
+        self.context_data.insert(
+            entities,
+            locale,
+            context_id,
+            application_id,
+            session_id,
+            user_id
+        )
+
+    def update(self, context_id: ObjectId, _rev: ObjectId, messages: list):
         in_messages = (x for x in messages if x["direction"] == MessageDirection.IN.value)
         last_in_message = next(in_messages, None)
         entities = []
