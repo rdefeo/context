@@ -36,7 +36,6 @@ class Message(RequestHandler):
     @asynchronous
     @engine
     def post(self, context_id, *args, **kwargs):
-        # TODO get existing context here
         message = self.message_data.insert(
             self._path_extractor.context_id(context_id),
             self._body_extractor.direction(),
@@ -44,13 +43,13 @@ class Message(RequestHandler):
             detection=self._body_extractor.detection()
         )
 
-        # TODO expect ver to more efficiently get messages
-
-        # TODO get messages
-
-        # TODO calculate new context
+        # existing_context = self.context_data.get(self._path_extractor.context_id(context_id), self._param_extractor.rev())
         _rev = message["_id"]
-        self.contextualizer.update(self._path_extractor.context_id(context_id), _rev, [message])
+        self.contextualizer.update(
+            self._path_extractor.context_id(context_id),
+            _rev,
+            [message]
+        )
 
         self.set_status(201)
         self.set_header("Location", "/%s/messages/%s" % (context_id, message["_id"]))

@@ -54,7 +54,10 @@ class Contextualizer(object):
     def update(self, context_id: ObjectId, _rev: ObjectId, messages: list):
         in_messages = (x for x in messages if x["direction"] == MessageDirection.IN.value)
         last_in_message = next(in_messages, None)
-        entities = []
+        existing_context = self.context_data.get(context_id, _rev)
+
+        entities = existing_context["entities"] if existing_context is not None and "entities" in existing_context else []
+
         if last_in_message is not None:
             for outcome in last_in_message["detection"]["outcomes"]:
                 for x in outcome["entities"]:

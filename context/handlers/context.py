@@ -1,11 +1,9 @@
 from bson import ObjectId
 from bson.json_util import dumps
+from tornado.web import RequestHandler, asynchronous
 
 from context.contextualizer import Contextualizer
 from context.handlers.extractors import ParamExtractor, PathExtractor
-
-__author__ = 'robdefeo'
-from tornado.web import RequestHandler, asynchronous
 
 
 class Context(RequestHandler):
