@@ -18,9 +18,9 @@ class Message(Base):
     LOGGER = logging.getLogger(__name__)
     collection_name = "message"
 
-    def find(self, context_id=None) -> list:
+    def find(self, context_id=None):
         """
-
+        :rtype : list
         :type context_id: ObjectId
         """
         query = {}
