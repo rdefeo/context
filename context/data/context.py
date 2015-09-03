@@ -58,9 +58,11 @@ class Context(Base):
             "_rev": new_context_id
         }
 
-    def update(self, context_id, _rev, entities=None, now=None) -> ObjectId:
+    def update(self, context_id, _rev, entities=None, now=None):
 
         """
+
+        :rtype : ObjectId
         :type now: datetime
         :type entities: list
         :type _rev: ObjectId
