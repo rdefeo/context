@@ -18,7 +18,11 @@ class Message(Base):
     LOGGER = logging.getLogger(__name__)
     collection_name = "message"
 
-    def find(self, context_id: ObjectId=None) -> list:
+    def find(self, context_id=None) -> list:
+        """
+
+        :type context_id: ObjectId
+        """
         query = {}
         if context_id is not None:
             query["context_id"] = context_id
@@ -26,8 +30,17 @@ class Message(Base):
             raise Exception("No parameters")
         return list(self.collection.find(query))
 
-    def insert(self, context_id: ObjectId, direction: Direction, text: str, detection: dict=None,
-               _id: ObjectId=None, now: datetime=None) -> dict:
+    def insert(self, context_id, direction, text, detection=None,
+               _id=None, now=None):
+        """
+        :rtype : dict
+        :type now: datetime
+        :type _id: ObjectId
+        :type detection: dict
+        :type text: str
+        :type direction: Direction
+        :type context_id: ObjectId
+        """
         now = datetime.now() if now is None else now
 
         _id = ObjectId() if _id is None else _id
@@ -48,7 +61,11 @@ class Message(Base):
 
         return data
 
-    def update(self, _id: ObjectId, now: datetime=None):
+    def update(self, _id, now=None):
+        """
+        :type now: datetime
+        :type _id: ObjectId
+        """
         now = datetime.now() if now is None else now
 
         self.collection.update(
