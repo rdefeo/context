@@ -60,12 +60,14 @@ class Feedback(Base):
                     heart_count: 0,
                     total_count: 0
                 };
-                values.forEach(function(value) {
-                    result.affiliate_redirect_count += value.affiliate_redirect_count;
-                    result.detail_count += value.detail_count;
-                    result.heart_count += value.heart_count;
-                    result.total_count += value.total_count;
-                });
+                values.forEach(
+                    function(value) {
+                        result.affiliate_redirect_count += value.affiliate_redirect_count;
+                        result.detail_count += value.detail_count;
+                        result.heart_count += value.heart_count;
+                        result.total_count += value.total_count;
+                    }
+                );
 
                 return result;
 
