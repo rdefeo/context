@@ -23,8 +23,17 @@ class Context(Base):
             self.cache[_id] = data
             return data
 
-    def insert(self, entities: list, locale: str, new_context_id: ObjectId, application_id: ObjectId,
-               session_id: ObjectId, user_id: ObjectId, now=None):
+    def insert(self, entities, locale, new_context_id, application_id,
+               session_id, user_id, now=None):
+        """
+
+        :type user_id: ObjectId
+        :type session_id: ObjectId
+        :type application_id: ObjectId
+        :type new_context_id: ObjectId
+        :type locale: str
+        :type entities: list
+        """
         if now is None:
             now = datetime.now()
 
@@ -49,8 +58,14 @@ class Context(Base):
             "_rev": new_context_id
         }
 
-    def update(self, context_id: ObjectId, _rev: ObjectId, entities: list=None, now: datetime=None) -> ObjectId:
+    def update(self, context_id, _rev, entities=None, now=None) -> ObjectId:
 
+        """
+        :type now: datetime
+        :type entities: list
+        :type _rev: ObjectId
+        :type context_id: ObjectId
+        """
         now = datetime.now() if now is None else now
         set_data = {
             "_rev": _rev,
