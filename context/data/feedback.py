@@ -12,7 +12,15 @@ class Feedback(Base):
     LOGGER = logging.getLogger(__name__)
     collection_name = "feedback"
 
-    def insert(self, user_id: ObjectId, application_id: ObjectId, session_id: ObjectId, context_id: ObjectId, product_id: ObjectId, _type, meta_data,_id: ObjectId=None, now=None):
+    def insert(self, user_id, application_id, session_id, context_id, product_id, _type, meta_data, _id=None, now=None):
+        """
+        :type _id: ObjectId
+        :type product_id: ObjectId
+        :type context_id: ObjectId
+        :type session_id: ObjectId
+        :type application_id: ObjectId
+        :type user_id: ObjectId
+        """
         _id = ObjectId() if _id is None else _id
         now = datetime.now() if now is None else now
 
