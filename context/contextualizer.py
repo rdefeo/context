@@ -56,7 +56,6 @@ class Contextualizer(object):
             user_id
         )
 
-
     def update(self, context_id: ObjectId, _rev: ObjectId, messages: list):
         in_messages = (x for x in messages if x["direction"] == MessageDirection.IN.value)
         last_in_message = next(in_messages, None)
@@ -100,23 +99,44 @@ class Contextualizer(object):
         self.context_data.update(context_id, _rev, entities=entities)
         return entities
 
-    def calculate_weighting(self, entity):
+    @staticmethod
+    def calculate_weighting(entity):
         weighting = entity["type_weighting"]
         weighting *= entity["confidence"] / 100 if "confidence" in entity else 1
         weighting *= entity["negation_modifier"] if "negation_modifier" in entity else 1
         weighting *= entity["type_index_modifier"] if "type_index_modifier" in entity else 1
         return weighting
 
-    def create_entity_type_index_modifier(self, entities):
+    @staticmethod
+    def create_entity_type_index_modifier(entities):
+        new_entities = []
+
         type_grouping = defaultdict(list)
         for x in entities:
             type_grouping[x["type"]].append(x)
 
-        new_entities = []
-        for value in type_grouping.values():
-            for index, entity in enumerate(value[::-1]):
-                entity["type_index_modifier"] = 1 / sqrt(index + 1)
+        type_grouping_with_message_index_order = {}
+        for type_grouping_item in type_grouping.items():
+            _type = type_grouping_item[0]
+            type_grouping_with_message_index_order[_type] = defaultdict(list)
+            for x in type_grouping_item[1]:
+                type_grouping_with_message_index_order[_type][x["entity_message_index"]].append(x)
+                pass
 
-                new_entities.append(entity)
+        for _type in type_grouping_with_message_index_order.keys():
+            sorted_message_index = sorted(type_grouping_with_message_index_order[_type].keys(), reverse=True)
+            for index, message_index in enumerate(sorted_message_index):
+                for entity in type_grouping_with_message_index_order[_type][message_index]:
+                    entity["type_index_modifier"] = 1 / sqrt(index + 1)
+
+                    new_entities.append(entity)
+        #
+        #     pass
+        #
+        # for type_grouping_value in type_grouping.values():
+        #     for index, entity in enumerate(type_grouping_value[::-1]):
+        #         entity["type_index_modifier"] = 1 / sqrt(index + 1)
+        #
+        #         new_entities.append(entity)
 
         return entities

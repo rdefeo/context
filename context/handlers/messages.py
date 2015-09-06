@@ -24,9 +24,9 @@ class Message(RequestHandler):
         self._body_extractor = BodyExtractor(self)
 
         from context.contextualizer import Contextualizer
-        self.contextualizer = Contextualizer()
         self.context_data = data.ContextData()
         self.context_data.open_connection()
+        self.contextualizer = Contextualizer(self.context_data)
         self.message_data = data.MessageData()
         self.message_data.open_connection()
 
