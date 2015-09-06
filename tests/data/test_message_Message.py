@@ -67,7 +67,7 @@ class insert_tests(TestCase):
                 'created': '2000-01-01T00:00:00',
                 'text': 'text_value',
                 'direction': 1,
-                'version': "0.0.2"
+                'version': "0.0.3"
             },
             target.collection.insert.call_args_list[0][0][0]
         )
@@ -80,7 +80,7 @@ class insert_tests(TestCase):
                 'direction': 1,
                 'text': 'text_value',
                 'updated': '2000-01-01T00:00:00',
-                'version': '0.0.2'
+                'version': '0.0.3'
             },
             actual
         )
@@ -108,7 +108,7 @@ class insert_tests(TestCase):
                 'created': '2000-01-01T00:00:00',
                 'text': 'text_value',
                 'direction': 1,
-                'version': "0.0.2"
+                'version': "0.0.3"
             },
             target.collection.insert.call_args_list[0][0][0]
         )
@@ -122,7 +122,7 @@ class insert_tests(TestCase):
                 'detection': 'detection_value',
                 'text': 'text_value',
                 'updated': '2000-01-01T00:00:00',
-                'version': '0.0.2'
+                'version': '0.0.3'
             },
             actual
         )

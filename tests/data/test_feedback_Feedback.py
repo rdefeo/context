@@ -37,7 +37,7 @@ class insert_tests(TestCase):
                 'application_id': 'application_id_value',
                 'user_id': 'user_id',
                 'meta_data': 'meta_data_value',
-                'version': '0.0.2'
+                'version': '0.0.3'
             }
         )
 
@@ -71,7 +71,7 @@ class insert_tests(TestCase):
                 'session_id': 'session_id',
                 'application_id': 'application_id_value',
                 'meta_data': 'meta_data_value',
-                'version': '0.0.2'
+                'version': '0.0.3'
             }
         )
 
@@ -105,7 +105,7 @@ class insert_tests(TestCase):
                 'session_id': 'session_id',
                 'application_id': 'application_id_value',
                 'user_id': 'user_id',
-                'version': '0.0.2'
+                'version': '0.0.3'
             }
         )
 
@@ -137,7 +137,7 @@ class insert_tests(TestCase):
                 'session_id': 'session_id',
                 'application_id': 'application_id_value',
                 'user_id': 'user_id',
-                'version': '0.0.2',
+                'version': '0.0.3',
                 'meta_data': 'meta_data_value'
             },
             target.collection.insert.call_args_list[0][0][0]

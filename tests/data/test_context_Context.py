@@ -118,7 +118,7 @@ class insert_tests(TestCase):
                 'application_id': 'application_id_value',
                 'user_id': 'user_id',
                 '_rev': 'new_context_id_value',
-                'version': "0.0.2"
+                'version': "0.0.3"
             },
             target.collection.insert.call_args_list[0][0][0]
         )
@@ -151,7 +151,7 @@ class insert_tests(TestCase):
                 'session_id': 'session_id',
                 'application_id': 'application_id_value',
                 '_rev': 'new_context_id_value',
-                'version': '0.0.2'
+                'version': '0.0.3'
             },
             target.collection.insert.call_args_list[0][0][0]
         )
