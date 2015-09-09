@@ -56,6 +56,41 @@ class Contextualizer(object):
             user_id
         )
 
+    def add_entity_to_context(self, entities: list, outcome_intent: str, confidence: float, _type: str, key: str):
+        detection_entities = [x for x in entities if x["source"] == "detection"]
+        next_entity_message_index = max([x["entity_message_index"] for x in detection_entities]) + 1 if any(
+            detection_entities) else 0
+
+        if confidence > 70.0:
+            entity = {
+                "key": key,
+                "type": _type,
+                "confidence": confidence,
+                "type_weighting": self.get_global_weighting(_type),
+                "source": "detection",
+                "entity_message_index": next_entity_message_index
+            }
+
+            negation_modifier = -100 if outcome_intent == "exclude" or outcome_intent == "dislike" else None
+
+            existing_entity = next((x for x in detection_entities if x["type"] == _type and x["key"] == key), None)
+            if existing_entity is not None:
+                existing_entity["entity_message_index"] = next_entity_message_index
+                existing_entity["type_weighting"] = self.get_global_weighting(_type) * 1.1
+                existing_entity["confidence"] = max(confidence, existing_entity["confidence"])
+                if negation_modifier is None:
+                    existing_entity.pop("negation_modifier", None)
+                else:
+                    existing_entity["negation_modifier"] = negation_modifier
+            else:
+                if negation_modifier is None:
+                    entity.pop("negation_modifier", None)
+                else:
+                    entity["negation_modifier"] = negation_modifier
+                entities.append(entity)
+
+        return entities
+
     def update(self, context_id: ObjectId, _rev: ObjectId, messages: list):
         in_messages = (x for x in messages if x["direction"] == MessageDirection.IN.value)
         last_in_message = next(in_messages, None)
@@ -63,26 +98,11 @@ class Contextualizer(object):
 
         entities = existing_context[
             "entities"] if existing_context is not None and "entities" in existing_context else []
-        detection_entities = [x for x in entities if x["source"] == "detection"]
-        next_entity_message_index = max([x["entity_message_index"] for x in detection_entities]) + 1 if any(
-            detection_entities) else 0
 
         if last_in_message is not None:
             for outcome in last_in_message["detection"]["outcomes"]:
                 for x in outcome["entities"]:
-                    if x["confidence"] > 70.0:
-                        entity = {
-                            "key": x["key"],
-                            "type": x["type"],
-                            "confidence": x["confidence"],
-                            "type_weighting": self.get_global_weighting(x["type"]),
-                            "source": "detection",
-                            "entity_message_index": next_entity_message_index
-                        }
-                        if outcome["intent"] == "exclude":
-                            entity["negation_modifier"] = -100
-
-                        entities.append(entity)
+                    entities = self.add_entity_to_context(entities, outcome["intent"], x["confidence"], x["type"], x["key"])
         else:
             # TODO need to decide what to do here
             pass
@@ -94,7 +114,6 @@ class Contextualizer(object):
 
         for x in entities:
             x["weighting"] = self.calculate_weighting(x)
-            pass
 
         self.context_data.update(context_id, _rev, entities=entities)
         return entities
