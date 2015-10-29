@@ -5,6 +5,7 @@ from bson.json_util import dumps
 
 from context import data, __version__
 from context.handlers.extractors import ParamExtractor, BodyExtractor, PathExtractor
+from context.settings import ADD_CORS_HEADERS
 
 
 class Message(RequestHandler):
@@ -43,7 +44,6 @@ class Message(RequestHandler):
             detection=self._body_extractor.detection()
         )
 
-        # existing_context = self.context_data.get(self._path_extractor.context_id(context_id), self._param_extractor.rev())
         _rev = message["_id"]
         self.contextualizer.update(
             self._path_extractor.context_id(context_id),
@@ -77,6 +77,10 @@ class Messages(RequestHandler):
 
     def on_finish(self):
         pass
+
+    def set_default_headers(self):
+        if ADD_CORS_HEADERS:
+            self.set_header("Access-Control-Allow-Origin", "*")
 
     @asynchronous
     @engine

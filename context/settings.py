@@ -21,3 +21,5 @@ DATA_CACHE_SIZE_CONTEXT = 2048
 PORT = int(get_env_setting("CONTEXT_PORT", 17999))
 
 CONTEXT_CACHE_SIZE = int(get_env_setting("CONTEXT_CONTEXT_CACHE_SIZE", 2048))
+
+ADD_CORS_HEADERS = bool(int(get_env_setting("ADD_CORS_HEADERS", 0)))
