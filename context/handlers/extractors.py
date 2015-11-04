@@ -1,10 +1,11 @@
+from datetime import datetime
 from bson import ObjectId
 from bson.errors import InvalidId
 from bson.json_util import loads
 from tornado.escape import json_encode, json_decode
 from tornado.web import RequestHandler, Finish
 from context.data import MessageDirection
-
+import dateutil.parser
 
 class PathExtractor:
     def __init__(self, handler: RequestHandler):
@@ -71,6 +72,22 @@ class BodyExtractor:
                     {
                         "status": "error",
                         "message": "invalid direction,direction=%s" % raw_direction
+                    }
+                )
+            )
+            raise Finish()
+
+    def created(self) -> datetime:
+        raw_created = self.body()["created"] if "created" in self.body() else None
+        try:
+            return dateutil.parser.parse(raw_created)
+        except:
+            self.handler.set_status(412)
+            self.handler.finish(
+                json_encode(
+                    {
+                        "status": "error",
+                        "message": "invalid created,created=%s" % raw_created
                     }
                 )
             )

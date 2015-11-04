@@ -2,9 +2,10 @@ from __future__ import absolute_import
 import logging
 from enum import Enum, unique
 from datetime import datetime
-from context import __version__
+
 from bson import ObjectId
 
+from context import __version__
 from context.data.base import Base
 
 
@@ -28,10 +29,9 @@ class Message(Base):
             query["context_id"] = context_id
         if not any(query):
             raise Exception("No parameters")
-        return list(self.collection.find(query))
+        return list(self.collection.find(query).sort("created", 1))
 
-    def insert(self, context_id, direction, text, detection=None,
-               _id=None, now=None):
+    def insert(self, context_id, direction, text, detection=None, _id=None, now=None):
         """
         :rtype : dict
         :type now: datetime

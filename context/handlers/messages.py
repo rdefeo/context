@@ -41,7 +41,8 @@ class Message(RequestHandler):
             self._path_extractor.context_id(context_id),
             self._body_extractor.direction(),
             self._body_extractor.text(),
-            detection=self._body_extractor.detection()
+            detection=self._body_extractor.detection(),
+            now=self._body_extractor.created()
         )
 
         _rev = message["_id"]

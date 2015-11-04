@@ -5,3 +5,4 @@ mock>=1.0.1
 cachetools>=1.0.0
 pyslack>=0.1.0
 pylru>=1.0.9
+python-dateutil
