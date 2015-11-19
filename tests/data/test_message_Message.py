@@ -1,8 +1,7 @@
 from bson import ObjectId
 
-__author__ = 'robdefeo'
 from unittest import TestCase
-from mock import Mock
+from mock import Mock, MagicMock
 from context.data.message import Direction, Message as Target
 from datetime import datetime
 
@@ -10,17 +9,13 @@ from datetime import datetime
 class get_tests(TestCase):
     def test_regular(self):
         target = Target()
-        target.collection = Mock()
-        target.collection.find.return_value = ["first", "second"]
+        target.collection = MagicMock()
+        target.collection.find().sort.return_value = ["first", "second"]
         actual = target.find(ObjectId("012345678901234567890123"))
 
         self.assertListEqual(['first', 'second'], actual)
 
-        self.assertEqual(1, target.collection.find.call_count)
-        self.assertDictEqual(
-            {'context_id': ObjectId('012345678901234567890123')},
-            target.collection.find.call_args_list[0][0][0]
-        )
+        self.assertEqual(2, target.collection.find.call_count)
 
 
 class update_tests(TestCase):
