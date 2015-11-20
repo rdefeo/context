@@ -1,10 +1,10 @@
-from bson import ObjectId
-
 __author__ = 'robdefeo'
 from unittest import TestCase
-from mock import Mock
-from context.data.context import Context as Target
 from datetime import datetime
+
+from mock import Mock
+
+from context.data.context import Context as Target
 
 
 class get_tests(TestCase):
@@ -22,6 +22,7 @@ class get_tests(TestCase):
             target.collection.find.call_args_list[0][0][0]
         )
 
+
 class update_tests(TestCase):
     def test_regular(self):
         target = Target()
@@ -30,7 +31,7 @@ class update_tests(TestCase):
             "context_id_value",
             "new_ver_id_value",
             "entites_value",
-            datetime(2000, 1, 1)
+            now=datetime(2000, 1, 1)
         )
 
         self.assertEqual(
@@ -50,7 +51,8 @@ class update_tests(TestCase):
                 '$set': {
                     '_rev': 'new_ver_id_value',
                     'entities': 'entites_value',
-                    'updated': '2000-01-01T00:00:00'
+                    'updated': '2000-01-01T00:00:00',
+                    'unsupported_entities': {}
                 }
             },
             target.collection.update.call_args_list[0][0][1]
@@ -82,11 +84,13 @@ class update_tests(TestCase):
             {
                 '$set': {
                     '_rev': 'new_ver_id_value',
-                    'updated': '2000-01-01T00:00:00'
+                    'updated': '2000-01-01T00:00:00',
+                    'unsupported_entities': {}
                 }
             },
             target.collection.update.call_args_list[0][0][1]
         )
+
 
 class insert_tests(TestCase):
     def test_regular(self):

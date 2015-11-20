@@ -91,32 +91,67 @@ class Contextualizer(object):
 
         return entities
 
-    def update(self, context_id: ObjectId, _rev: ObjectId, messages: list):
-        in_messages = (x for x in messages if x["direction"] == MessageDirection.IN.value)
-        last_in_message = next(in_messages, None)
-        existing_context = self.context_data.get(context_id, _rev)
+    def extract_user_messages(self, messages):
+        return (x for x in messages if x["direction"] == MessageDirection.IN.value)
 
-        entities = existing_context[
-            "entities"] if existing_context is not None and "entities" in existing_context else []
+    def extract_last_user_message(self, message):
+        return next(self.extract_user_messages(message), None)
 
-        if last_in_message is not None:
-            for outcome in last_in_message["detection"]["outcomes"]:
+    def extract_entities(self, context):
+        return context["entities"] if context is not None and "entities" in context else []
+
+    def update_entities_with_last_message(self, entities, last_user_message):
+        if last_user_message is not None:
+            for outcome in last_user_message["detection"]["outcomes"]:
                 for x in outcome["entities"]:
-                    entities = self.add_entity_to_context(entities, outcome["intent"], x["confidence"], x["type"], x["key"])
+                    entities = self.add_entity_to_context(
+                        entities,
+                        outcome["intent"],
+                        x["confidence"],
+                        x["type"],
+                        x["key"]
+                    )
         else:
             # TODO need to decide what to do here
             pass
 
-        if any(x for x in entities if x["source"] != "detection"):
+        return entities
+
+    def remove_default_entities_if_detections(self, entities):
+        if any(x for x in entities if x["source"] == "detection"):
             entities = [x for x in entities if x["source"] != "default"]
 
-        entities = self.create_entity_type_index_modifier(entities)
+        return entities
 
+    def change_entities_weighting(self, entities):
         for x in entities:
             x["weighting"] = self.calculate_weighting(x)
 
-        self.context_data.update(context_id, _rev, entities=entities)
         return entities
+
+    def update(self, context_id: ObjectId, _rev: ObjectId, messages: list):
+        last_in_message = self.extract_last_user_message(messages)
+        existing_context = self.context_data.get(context_id, _rev)
+        extracted_entities = self.extract_entities(existing_context)
+
+        unsupported_entities = {}
+
+        entities_including_last_message = self.update_entities_with_last_message(extracted_entities, last_in_message)
+
+        entities_removing_default_if_possible = self.remove_default_entities_if_detections(
+            entities_including_last_message)
+
+        entities_with_entity_type_modified = self.create_entity_type_index_modifier(
+            entities_removing_default_if_possible)
+
+        entities_with_updated_weightings = self.change_entities_weighting(entities_with_entity_type_modified)
+
+        self.context_data.update(
+            context_id,
+            _rev,
+            entities=entities_with_updated_weightings,
+            unsupported_entities=unsupported_entities
+        )
 
     @staticmethod
     def calculate_weighting(entity):

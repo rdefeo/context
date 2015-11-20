@@ -58,7 +58,7 @@ class Context(Base):
             "_rev": new_context_id
         }
 
-    def update(self, context_id, _rev, entities=None, now=None):
+    def update(self, context_id, _rev, entities=None, unsupported_entities=None, now=None):
 
         """
 
@@ -75,6 +75,8 @@ class Context(Base):
         }
         if entities is not None:
             set_data["entities"] = entities
+
+        set_data["unsupported_entities"] = unsupported_entities if unsupported_entities is not None else {}
 
         self.collection.update(
             {
