@@ -1,14 +1,17 @@
 __author__ = 'robdefeo'
 from unittest import TestCase
 
-from mock import Mock, MagicMock
+from mock import MagicMock, call
 
 from context.contextualizer import Contextualizer as Target
 
 
 class add_entity_to_context_tests(TestCase):
     def test_empty_entities(self):
-        target = Target(Mock())
+        context_data = MagicMock()
+        attribute_product_data = MagicMock()
+
+        target = Target(context_data, attribute_product_data)
         actual = target.add_entity_to_context(
             [],
             "include",
@@ -32,7 +35,10 @@ class add_entity_to_context_tests(TestCase):
         )
 
     def test_entities(self):
-        target = Target(Mock())
+        context_data = MagicMock()
+        attribute_product_data = MagicMock()
+
+        target = Target(context_data, attribute_product_data)
         actual = target.add_entity_to_context(
             [
                 {
@@ -70,7 +76,10 @@ class add_entity_to_context_tests(TestCase):
         )
 
     def test_existing_entity(self):
-        target = Target(Mock())
+        context_data = MagicMock()
+        attribute_product_data = MagicMock()
+
+        target = Target(context_data, attribute_product_data)
         actual = target.add_entity_to_context(
             [
                 {
@@ -104,7 +113,10 @@ class add_entity_to_context_tests(TestCase):
         )
 
     def test_existing_include_entity_now_exclude(self):
-        target = Target(Mock())
+        context_data = MagicMock()
+        attribute_product_data = MagicMock()
+
+        target = Target(context_data, attribute_product_data)
         actual = target.add_entity_to_context(
             [
                 {
@@ -139,7 +151,10 @@ class add_entity_to_context_tests(TestCase):
         )
 
     def test_existing_exclude_entity_now_include(self):
-        target = Target(Mock())
+        context_data = MagicMock()
+        attribute_product_data = MagicMock()
+
+        target = Target(context_data, attribute_product_data)
         actual = target.add_entity_to_context(
             [
                 {
@@ -174,7 +189,10 @@ class add_entity_to_context_tests(TestCase):
         )
 
     def test_existing_exclude_entity(self):
-        target = Target(Mock())
+        context_data = MagicMock()
+        attribute_product_data = MagicMock()
+
+        target = Target(context_data, attribute_product_data)
         actual = target.add_entity_to_context(
             [
                 {
@@ -210,7 +228,10 @@ class add_entity_to_context_tests(TestCase):
         )
 
     def test_outcome_exclude_entities(self):
-        target = Target(Mock())
+        context_data = MagicMock()
+        attribute_product_data = MagicMock()
+
+        target = Target(context_data, attribute_product_data)
         actual = target.add_entity_to_context(
             [
                 {
@@ -249,7 +270,10 @@ class add_entity_to_context_tests(TestCase):
         )
 
     def test_low_confidence_entities(self):
-        target = Target(Mock())
+        context_data = MagicMock()
+        attribute_product_data = MagicMock()
+
+        target = Target(context_data, attribute_product_data)
         actual = target.add_entity_to_context(
             [
                 {
@@ -281,8 +305,10 @@ class add_entity_to_context_tests(TestCase):
 
 class create_tests(TestCase):
     def test_regular(self):
-        context_data = Mock()
-        target = Target(context_data)
+        context_data = MagicMock()
+        attribute_product_data = MagicMock()
+
+        target = Target(context_data, attribute_product_data)
         target.create("context_id_key", "user_id_key", "application_id_key", "session_id_key", "locale_key")
 
         self.assertEqual(1, context_data.insert.call_count)
@@ -301,7 +327,10 @@ class create_tests(TestCase):
 
 class create_entity_type_index_modifier_tests(TestCase):
     def test_empty_entities(self):
-        target = Target(None)
+        context_data = MagicMock()
+        attribute_product_data = MagicMock()
+
+        target = Target(context_data, attribute_product_data)
         actual = target.create_entity_type_index_modifier([])
 
         self.assertListEqual(
@@ -310,7 +339,10 @@ class create_entity_type_index_modifier_tests(TestCase):
         )
 
     def test_single_entity(self):
-        target = Target(None)
+        context_data = MagicMock()
+        attribute_product_data = MagicMock()
+
+        target = Target(context_data, attribute_product_data)
         actual = target.create_entity_type_index_modifier(
             [
                 {
@@ -340,7 +372,10 @@ class create_entity_type_index_modifier_tests(TestCase):
         )
 
     def test_multiple_entity_different_type_same_message_index(self):
-        target = Target(None)
+        context_data = MagicMock()
+        attribute_product_data = MagicMock()
+
+        target = Target(context_data, attribute_product_data)
         actual = target.create_entity_type_index_modifier(
             [
                 {
@@ -387,7 +422,10 @@ class create_entity_type_index_modifier_tests(TestCase):
         )
 
     def test_multiple_entity_different_type_different_message_index(self):
-        target = Target(None)
+        context_data = MagicMock()
+        attribute_product_data = MagicMock()
+
+        target = Target(context_data, attribute_product_data)
         actual = target.create_entity_type_index_modifier(
             [
                 {
@@ -434,7 +472,10 @@ class create_entity_type_index_modifier_tests(TestCase):
         )
 
     def test_multiple_entity_same_type_same_message_index(self):
-        target = Target(None)
+        context_data = MagicMock()
+        attribute_product_data = MagicMock()
+
+        target = Target(context_data, attribute_product_data)
         actual = target.create_entity_type_index_modifier(
             [
                 {
@@ -481,7 +522,10 @@ class create_entity_type_index_modifier_tests(TestCase):
         )
 
     def test_multiple_entity_same_type_different_message_index(self):
-        target = Target(None)
+        context_data = MagicMock()
+        attribute_product_data = MagicMock()
+
+        target = Target(context_data, attribute_product_data)
         actual = target.create_entity_type_index_modifier(
             [
                 {
@@ -531,7 +575,9 @@ class create_entity_type_index_modifier_tests(TestCase):
 class extract_user_messages(TestCase):
     def test_regular(self):
         context_data = MagicMock()
-        target = Target(context_data)
+        attribute_product_data = MagicMock()
+
+        target = Target(context_data, attribute_product_data)
         in_messages = target.extract_user_messages(
             [
                 {
@@ -551,7 +597,9 @@ class extract_user_messages(TestCase):
 class extract_last_user_message(TestCase):
     def test_items(self):
         context_data = MagicMock()
-        target = Target(context_data)
+        attribute_product_data = MagicMock()
+
+        target = Target(context_data, attribute_product_data)
         target.extract_user_messages = MagicMock(return_value=["value_1", "value_2"].__iter__())
         actual = target.extract_last_user_message("messages_value")
 
@@ -561,13 +609,17 @@ class extract_last_user_message(TestCase):
 class extract_entities(TestCase):
     def test_none_context(self):
         context_data = MagicMock()
-        target = Target(context_data)
+        attribute_product_data = MagicMock()
+
+        target = Target(context_data, attribute_product_data)
         actual = target.extract_entities(None)
         self.assertListEqual([], actual)
 
     def test_empty_entities(self):
         context_data = MagicMock()
-        target = Target(context_data)
+        attribute_product_data = MagicMock()
+
+        target = Target(context_data, attribute_product_data)
         actual = target.extract_entities(
             {
                 "entities": []
@@ -577,7 +629,9 @@ class extract_entities(TestCase):
 
     def test_entities(self):
         context_data = MagicMock()
-        target = Target(context_data)
+        attribute_product_data = MagicMock()
+
+        target = Target(context_data, attribute_product_data)
         actual = target.extract_entities(
             {
                 "entities": [
@@ -598,7 +652,9 @@ class extract_entities(TestCase):
 class update_entities(TestCase):
     def test_regular(self):
         context_data = MagicMock()
-        target = Target(context_data)
+        attribute_product_data = MagicMock()
+
+        target = Target(context_data, attribute_product_data)
         target.add_entity_to_context = MagicMock(
             side_effect=(
                 [
@@ -645,7 +701,9 @@ class remove_default_entities_if_detections(TestCase):
         context_data = MagicMock()
         context_data.get = MagicMock(return_value="existing_context_value")
 
-        target = Target(context_data)
+        attribute_product_data = MagicMock()
+
+        target = Target(context_data, attribute_product_data)
         actual = target.remove_default_entities_if_detections(
             [
                 {
@@ -668,7 +726,9 @@ class remove_default_entities_if_detections(TestCase):
         context_data = MagicMock()
         context_data.get = MagicMock(return_value="existing_context_value")
 
-        target = Target(context_data)
+        attribute_product_data = MagicMock()
+
+        target = Target(context_data, attribute_product_data)
         actual = target.remove_default_entities_if_detections(
             [
                 {
@@ -695,7 +755,9 @@ class remove_default_entities_if_detections(TestCase):
 class change_entities_weighting(TestCase):
     def test_regular(self):
         context_data = MagicMock()
-        target = Target(context_data)
+        attribute_product_data = MagicMock()
+
+        target = Target(context_data, attribute_product_data)
         target.calculate_weighting = MagicMock(
             side_effect=[
                 31,
@@ -721,18 +783,120 @@ class change_entities_weighting(TestCase):
         )
 
 
-class update(TestCase):
+class add_product_counts(TestCase):
     def test_regular(self):
         context_data = MagicMock()
-        context_data.get = MagicMock(return_value="existing_context_value")
+        attribute_product_data = MagicMock()
 
-        target = Target(context_data)
+        target = Target(context_data, attribute_product_data)
+        target.entity_product_count_cache = MagicMock(
+            side_effect=(
+                100,
+                0
+            )
+        )
+
+        actual = target.add_product_counts(
+            [
+                {
+                    "_id": 1,
+                    "key": "black",
+                    "type": "color"
+                },
+                {
+                    "_id": 2,
+                    "key": "men",
+                    "type": "division"
+                }
+            ]
+        )
+
+        self.assertListEqual(
+            [
+                {
+                    'meta': {'instock_product_count': 100}, 'type': 'color', '_id': 1, 'key': 'black'
+                },
+                {
+                    'meta': {'instock_product_count': 0}, 'type': 'division', '_id': 2, 'key': 'men'
+                }
+            ],
+            actual
+        )
+
+        self.assertListEqual(
+            [
+                call('color', 'black'),
+                call('division', 'men')
+            ],
+            target.entity_product_count_cache.call_args_list
+        )
+
+class split_unsupported_entities(TestCase):
+    def test_regular(self):
+        context_data = MagicMock()
+        attribute_product_data = MagicMock()
+
+        target = Target(context_data, attribute_product_data)
+
+        supported, unsupported = target.split_unsupported_entities(
+            [
+                {
+                    "_id": 1,
+                    "meta": {
+                        "instock_product_count": 0
+                    }
+                },
+                {
+                    "_id": 2,
+                    "meta": {
+                        "instock_product_count": 110
+                    }
+                }
+            ]
+        )
+
+        self.assertListEqual(
+            [
+                {
+                    "_id": 2,
+                    "meta": {
+                        "instock_product_count": 110
+                    }
+                }
+            ],
+            supported
+        )
+        self.assertListEqual(
+            [
+                {
+                    "_id": 1,
+                    "meta": {
+                        "instock_product_count": 0
+                    }
+                }
+            ],
+            unsupported
+        )
+
+
+class update(TestCase):
+    def test_last_message_user(self):
+        context_data = MagicMock()
+        context_data.get = MagicMock(return_value="existing_context_value")
+        attribute_product_data = MagicMock()
+
+        target = Target(context_data, attribute_product_data)
         target.extract_last_user_message = MagicMock(return_value="last_message")
         target.extract_entities = MagicMock(return_value="extracted_entities")
         target.remove_default_entities_if_detections = MagicMock(return_value="removed_entities")
-        target.update_entities_with_last_message = MagicMock(return_value="entities_update_entities_with_last_message")
-        target.create_entity_type_index_modifier = MagicMock(return_value="entities_create_entity_type_index_modifier")
+        target.update_entities_with_last_message = MagicMock(
+            return_value="entities_update_entities_with_last_message")
+        target.create_entity_type_index_modifier = MagicMock(
+            return_value="entities_create_entity_type_index_modifier")
         target.change_entities_weighting = MagicMock(return_value="entities_change_entities_weighting")
+
+        target.add_product_counts = MagicMock(return_value="entities_add_product_counts")
+        target.split_unsupported_entities = MagicMock(return_value=("supported_entities", "unsupported_entities"))
 
         target.update("context_id_value", "_rev_value", "messages_value")
 
@@ -744,5 +908,20 @@ class update(TestCase):
             'entities_update_entities_with_last_message')
         target.create_entity_type_index_modifier.assert_called_once_with('removed_entities')
         target.change_entities_weighting.assert_called_once_with('entities_create_entity_type_index_modifier')
-        context_data.update.assert_called_once_with('context_id_value', '_rev_value', unsupported_entities={},
-                                                    entities='entities_change_entities_weighting')
+        target.add_product_counts.assert_called_once_with('entities_change_entities_weighting')
+        target.split_unsupported_entities.assert_called_once_with("entities_add_product_counts")
+        context_data.update.assert_called_once_with('context_id_value', '_rev_value', unsupported_entities="unsupported_entities",
+                                                    entities='supported_entities')
+
+    def test_last_message_jemboo(self):
+        context_data = MagicMock()
+        attribute_product_data = MagicMock()
+
+        target = Target(context_data, attribute_product_data)
+        target.extract_last_user_message = MagicMock(return_value=None)
+
+        target.update("context_id_value", "_rev_value", "messages_value")
+
+        target.extract_last_user_message.assert_called_once_with("messages_value")
+        context_data.update.assert_called_once_with('context_id_value', '_rev_value')
+

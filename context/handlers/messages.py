@@ -6,6 +6,7 @@ from bson.json_util import dumps
 from context import data, __version__
 from context.handlers.extractors import ParamExtractor, BodyExtractor, PathExtractor
 from context.settings import ADD_CORS_HEADERS
+from context.contextualizer import Contextualizer
 
 
 class Message(RequestHandler):
@@ -19,15 +20,14 @@ class Message(RequestHandler):
     def data_received(self, chunk):
         pass
 
-    def initialize(self):
+    def initialize(self, contextualizer: Contextualizer):
         self._param_extractor = ParamExtractor(self)
         self._path_extractor = PathExtractor(self)
         self._body_extractor = BodyExtractor(self)
 
-        from context.contextualizer import Contextualizer
         self.context_data = data.ContextData()
         self.context_data.open_connection()
-        self.contextualizer = Contextualizer(self.context_data)
+        self.contextualizer = contextualizer
         self.message_data = data.MessageData()
         self.message_data.open_connection()
 

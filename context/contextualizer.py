@@ -1,14 +1,24 @@
 from collections import defaultdict
+import logging
 from math import sqrt
 
 from bson.objectid import ObjectId
 
+from pylru import FunctionCacheManager
+
 from context.data import MessageDirection, ContextData
+from context.settings import LOGGING_LEVEL
+from prproc.data import AttributeProductData
 
 
 class Contextualizer(object):
-    def __init__(self, context_data: ContextData):
+    logger = logging.getLogger(__name__)
+    logger.setLevel(LOGGING_LEVEL)
+
+    def __init__(self, context_data: ContextData, attribute_product_data: AttributeProductData):
+        self.entity_product_count_cache = FunctionCacheManager(self.__get_entity_product_count, 1000)
         self.context_data = context_data
+        self.attribute_product_data = attribute_product_data
         self._global_weightings = {
             "brand": 100.0,
             "color": 90.0,
@@ -20,6 +30,12 @@ class Contextualizer(object):
             "popular": 30.0,
             "added": 20.0
         }
+
+    def __get_entity_product_count(self, _type, key):
+        value = self.attribute_product_data.get(_type, key, fields={"value._ids_size": True})
+
+        return value["value"]["_ids_size"] if value is not None and "value" in value and "_ids_size" in value[
+            "value"] else 0
 
     def get_global_weighting(self, _type):
         if _type in self._global_weightings:
@@ -55,6 +71,43 @@ class Contextualizer(object):
             session_id,
             user_id
         )
+
+    def update(self, context_id: ObjectId, _rev: ObjectId, messages: list):
+        last_in_message = self.extract_last_user_message(messages)
+        if last_in_message is not None:
+            existing_context = self.context_data.get(context_id, _rev)
+            extracted_entities = self.extract_entities(existing_context)
+
+            entities_including_last_message = self.update_entities_with_last_message(extracted_entities,
+                                                                                     last_in_message)
+            entities_removing_default_if_possible = self.remove_default_entities_if_detections(
+                entities_including_last_message)
+            entities_with_entity_type_modified = self.create_entity_type_index_modifier(
+                entities_removing_default_if_possible)
+            entities_with_updated_weightings = self.change_entities_weighting(entities_with_entity_type_modified)
+            entities_with_counts = self.add_product_counts(entities_with_updated_weightings)
+
+            supported_entities, unsupported_entities = self.split_unsupported_entities(entities_with_counts)
+
+            self.context_data.update(
+                context_id,
+                _rev,
+                entities=supported_entities,
+                unsupported_entities=unsupported_entities
+            )
+        else:
+            self.context_data.update(context_id, _rev)
+
+    def split_unsupported_entities(self, entities):
+        supported_entities = []
+        unsupported_entities = []
+        for x in entities:
+            if x["meta"]["instock_product_count"] == 0:
+                unsupported_entities.append(x)
+            else:
+                supported_entities.append(x)
+
+        return supported_entities, unsupported_entities
 
     def add_entity_to_context(self, entities: list, outcome_intent: str, confidence: float, _type: str, key: str):
         detection_entities = [x for x in entities if x["source"] == "detection"]
@@ -129,29 +182,12 @@ class Contextualizer(object):
 
         return entities
 
-    def update(self, context_id: ObjectId, _rev: ObjectId, messages: list):
-        last_in_message = self.extract_last_user_message(messages)
-        existing_context = self.context_data.get(context_id, _rev)
-        extracted_entities = self.extract_entities(existing_context)
+    def add_product_counts(self, entities):
+        for x in entities:
+            x["meta"] = x["meta"] if "meta" in x else {}
+            x["meta"]["instock_product_count"] = self.entity_product_count_cache(x["type"], x["key"])
 
-        unsupported_entities = {}
-
-        entities_including_last_message = self.update_entities_with_last_message(extracted_entities, last_in_message)
-
-        entities_removing_default_if_possible = self.remove_default_entities_if_detections(
-            entities_including_last_message)
-
-        entities_with_entity_type_modified = self.create_entity_type_index_modifier(
-            entities_removing_default_if_possible)
-
-        entities_with_updated_weightings = self.change_entities_weighting(entities_with_entity_type_modified)
-
-        self.context_data.update(
-            context_id,
-            _rev,
-            entities=entities_with_updated_weightings,
-            unsupported_entities=unsupported_entities
-        )
+        return entities
 
     @staticmethod
     def calculate_weighting(entity):
