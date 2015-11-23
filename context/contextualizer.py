@@ -32,7 +32,7 @@ class Contextualizer(object):
         }
 
     def __get_entity_product_count(self, _type, key):
-        self.logger.debug("_type=%,key=%s", _type, key)
+        self.logger.debug("_type=%s,key=%s", _type, key)
         value = self.attribute_product_data.get(_type, key, fields={"value._ids_size": True})
 
         return value["value"]["_ids_size"] if value is not None and "value" in value and "_ids_size" in value[
