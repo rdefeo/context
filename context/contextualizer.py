@@ -103,7 +103,7 @@ class Contextualizer(object):
         supported_entities = []
         unsupported_entities = []
         for x in entities:
-            if x["meta"]["instock_product_count"] == 0:
+            if x["type"] != "non_attribute" and x["meta"]["instock_product_count"] == 0:
                 unsupported_entities.append(x)
             else:
                 supported_entities.append(x)

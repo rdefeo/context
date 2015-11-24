@@ -844,13 +844,15 @@ class split_unsupported_entities(TestCase):
                     "_id": 1,
                     "meta": {
                         "instock_product_count": 0
-                    }
+                    },
+                    "type": "color"
                 },
                 {
                     "_id": 2,
                     "meta": {
                         "instock_product_count": 110
-                    }
+                    },
+                    "type": "color"
                 }
             ]
         )
@@ -861,7 +863,8 @@ class split_unsupported_entities(TestCase):
                     "_id": 2,
                     "meta": {
                         "instock_product_count": 110
-                    }
+                    },
+                    'type': 'color'
                 }
             ],
             supported
@@ -872,7 +875,72 @@ class split_unsupported_entities(TestCase):
                     "_id": 1,
                     "meta": {
                         "instock_product_count": 0
-                    }
+                    },
+                    'type': 'color'
+                }
+            ],
+            unsupported
+        )
+
+    def test_non_attribute_regular(self):
+        context_data = MagicMock()
+        attribute_product_data = MagicMock()
+
+        target = Target(context_data, attribute_product_data)
+
+        supported, unsupported = target.split_unsupported_entities(
+            [
+                {
+                    "_id": 1,
+                    "meta": {
+                        "instock_product_count": 0
+                    },
+                    "type": "color"
+                },
+                {
+                    "_id": 2,
+                    "meta": {
+                        "instock_product_count": 0
+                    },
+                    "type": "non_attribute"
+                },
+                {
+                    "_id": 3,
+                    "meta": {
+                        "instock_product_count": 110
+                    },
+                    "type": "color"
+                }
+            ]
+        )
+
+        self.assertListEqual(
+            [
+                {
+                    "_id": 2,
+                    "meta": {
+                        "instock_product_count": 0
+                    },
+                    "type": "non_attribute"
+                },
+                {
+                    "_id": 3,
+                    "meta": {
+                        "instock_product_count": 110
+                    },
+                    "type": "color"
+                }
+            ],
+            supported
+        )
+        self.assertListEqual(
+            [
+                {
+                    "_id": 1,
+                    "meta": {
+                        "instock_product_count": 0
+                    },
+                    'type': 'color'
                 }
             ],
             unsupported
